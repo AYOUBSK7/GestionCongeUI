@@ -1,31 +1,77 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import AdminDashboard from '../views/admin/DashboardView.vue'
+import EmployeeDashboard from '../views/employee/DashboardView.vue'
+import { useAuthStore } from '../stores/auth'
+import Cookies from 'js-cookie'
+
+import EntrepriseListView from '../views/admin/entreprises/EntrepriseListView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/login',
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
     },
     {
       path: '/register',
       name: 'register',
-      component: RegisterView
+      component: RegisterView,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
+      path: '/admin/dashboard',
+      name: 'admin-dashboard',
+      component: AdminDashboard,
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/admin/entreprises',
+      name: 'admin-entreprises',
+      component: EntrepriseListView,
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/employee/dashboard',
+      name: 'employee-dashboard',
+      component: EmployeeDashboard,
+      meta: { requiresAuth: true, role: 'employe' },
+    },
+  ],
+})
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  const token = Cookies.get('token')
+
+  if (to.meta.requiresAuth) {
+    if (!token) {
+      return next('/login')
     }
-  ]
+
+    if (!authStore.user) {
+      try {
+        await authStore.fetchUser()
+      } catch (e) {
+        return next('/login')
+      }
+    }
+
+    const userRole = (authStore.user.role || '').toLowerCase()
+    const requiredRole = (to.meta.role || '').toLowerCase()
+
+    if (requiredRole && userRole !== requiredRole) {
+      return next(userRole === 'admin' ? '/admin/dashboard' : '/employee/dashboard')
+    }
+  }
+
+  next()
 })
 
 export default router

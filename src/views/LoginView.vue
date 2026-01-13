@@ -8,34 +8,42 @@
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <input
-            v-model="identifier"
+            v-model="form.userName"
             type="text"
             placeholder="E-mail ou Identifiant"
             class="input-azure"
             required
-          >
+          />
         </div>
 
         <div>
           <input
-            v-model="password"
+            v-model="form.password"
             type="password"
             placeholder="Mot de passe"
             class="input-azure"
             required
-          >
+          />
+        </div>
+
+        <div v-if="error" class="text-red-600 text-sm">
+          {{ error }}
         </div>
 
         <div class="text-sm">
-          Pas de compte ? <router-link to="/register" class="text-azure-blue hover:underline">Créez-en un !</router-link>
+          Pas de compte ?
+          <router-link to="/register" class="text-[#0067b8] hover:underline"
+            >Créez-en un !</router-link
+          >
         </div>
 
         <div class="flex justify-end pt-6">
           <button
             type="submit"
-            class="bg-[#0067b8] hover:bg-[#005a9e] text-white px-10 py-2 font-medium transition-colors shadow-sm"
+            :disabled="loading"
+            class="bg-[#0067b8] hover:bg-[#005a9e] text-white px-10 py-2 font-medium transition-colors shadow-sm disabled:opacity-50"
           >
-            Se connecter
+            {{ loading ? 'Connexion...' : 'Se connecter' }}
           </button>
         </div>
       </form>
@@ -44,16 +52,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
-const identifier = ref('')
-const password = ref('')
+const router = useRouter()
+const authStore = useAuthStore()
 
-const handleLogin = () => {
-  console.log('Tentative de connexion avec:', {
-    identifier: identifier.value,
-    password: password.value
-  })
+const form = reactive({
+  userName: '',
+  password: '',
+})
+
+const loading = ref(false)
+const error = ref(null)
+
+const handleLogin = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    const user = await authStore.login({
+      UserName: form.userName,
+      Password: form.password,
+    })
+    console.log('User role:', user.Role)
+    const role = (user.Role || '').toLowerCase()
+    if (role === 'admin') {
+      router.push('/admin/dashboard')
+    } else {
+      router.push('/employee/dashboard')
+    }
+  } catch (err) {
+    error.value = 'Identifiants incorrects'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

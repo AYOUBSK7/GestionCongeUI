@@ -9,6 +9,7 @@
       <form @submit.prevent="handleRegister" class="space-y-4">
         <!-- Informations Personnelles -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+          <input v-model="form.nom" type="text" placeholder="Nom" class="input-azure" required />
           <input
             v-model="form.prenom"
             type="text"
@@ -16,7 +17,6 @@
             class="input-azure"
             required
           />
-          <input v-model="form.nom" type="text" placeholder="Nom" class="input-azure" required />
           <input
             v-model="form.email"
             type="email"
@@ -24,26 +24,24 @@
             class="input-azure"
             required
           />
-          <input v-model="form.telephone" type="tel" placeholder="Téléphone" class="input-azure" />
+          <input v-model="form.adresse" type="text" placeholder="Adresse" class="input-azure" />
         </div>
-
-        <input v-model="form.adresse" type="text" placeholder="Adresse" class="input-azure" />
 
         <hr class="border-gray-100 my-2" />
 
         <!-- Informations de Compte -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
           <input
-            v-model="form.identifiant"
+            v-model="form.nomUtilisateur"
             type="text"
-            placeholder="Identifiant unique"
+            placeholder="Nom d'utilisateur"
             class="input-azure"
             required
           />
           <input
-            v-model="form.nomUtilisateur"
+            v-model="form.identifiant"
             type="text"
-            placeholder="Nom d'utilisateur"
+            placeholder="Identifiant unique"
             class="input-azure"
             required
           />
@@ -56,15 +54,23 @@
           required
         />
 
+        <div v-if="error" class="text-red-600 text-sm">
+          {{ error }}
+        </div>
+        <div v-if="success" class="text-green-600 text-sm">
+          {{ success }}
+        </div>
+
         <div class="flex items-center justify-between pt-2">
           <router-link to="/login" class="text-sm text-gray-600 hover:underline"
             >Déjà un compte ?</router-link
           >
           <button
             type="submit"
-            class="bg-[#0067b8] hover:bg-[#005a9e] text-white px-8 py-1.5 font-medium transition-colors"
+            :disabled="loading"
+            class="bg-[#0067b8] hover:bg-[#005a9e] text-white px-8 py-1.5 font-medium transition-colors disabled:opacity-50"
           >
-            S'inscrire
+            {{ loading ? "S'inscrire..." : "S'inscrire" }}
           </button>
         </div>
       </form>
@@ -73,21 +79,38 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { authService } from '../services/authService'
 
+const router = useRouter()
 const form = reactive({
   nomUtilisateur: '',
   email: '',
   motDePasse: '',
   prenom: '',
   nom: '',
-  telephone: '',
   adresse: '',
   identifiant: '',
 })
 
-const handleRegister = () => {
-  console.log("Données d'inscription:", { ...form })
+const loading = ref(false)
+const error = ref(null)
+const success = ref(null)
+
+const handleRegister = async () => {
+  loading.value = true
+  error.value = null
+  success.value = null
+  try {
+    await authService.register(form)
+    success.value = 'Compte créé avec succès !'
+    setTimeout(() => router.push('/login'), 2000)
+  } catch (err) {
+    error.value = err.response?.data || "Erreur lors de l'inscription"
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
