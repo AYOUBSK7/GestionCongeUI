@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-[#f3f2f1] flex flex-col">
+  <div class="h-screen bg-[#f3f2f1] flex flex-col overflow-hidden">
     <!-- Top Navbar -->
     <nav
-      class="bg-[#0078d4] text-white px-4 h-12 flex items-center justify-between shadow-sm z-30 flex-shrink-0"
+      class="bg-[#0078d4] text-white px-4 h-12 flex items-center justify-between shadow-sm z-30 shrink-0"
     >
       <div class="flex items-center space-x-4">
         <button
           @click="sidebarOpen = !sidebarOpen"
-          class="p-1 hover:bg-[#005a9e] rounded transition-colors"
+          class="p-1 hover:bg-azure-hover rounded transition-colors"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -24,18 +24,18 @@
       </div>
       <div class="flex items-center space-x-4 text-sm">
         <div
-          class="flex items-center space-x-2 px-2 py-1 hover:bg-[#005a9e] cursor-pointer rounded"
+          class="flex items-center space-x-2 px-2 py-1 hover:bg-azure-hover cursor-pointer rounded"
         >
           <div
             class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center font-bold text-xs"
           >
-            {{ authStore.user?.Prenom?.[0] }}{{ authStore.user?.Nom?.[0] }}
+            {{ authStore.user?.prenom?.[0] }}{{ authStore.user?.nom?.[0] }}
           </div>
           <span class="hidden sm:inline"
-            >{{ authStore.user?.Prenom }} {{ authStore.user?.Nom }}</span
+            >{{ authStore.user?.prenom }} {{ authStore.user?.nom }}</span
           >
         </div>
-        <button @click="handleLogout" class="p-1 hover:bg-[#005a9e] rounded" title="Déconnexion">
+        <button @click="handleLogout" class="p-1 hover:bg-azure-hover rounded" title="Déconnexion">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -59,12 +59,12 @@
       <!-- Sidebar -->
       <aside
         :class="[
-          'bg-white border-r border-gray-200 flex flex-col z-20 transition-all duration-300 ease-in-out h-full overflow-hidden',
+          'bg-white border-r border-gray-200 flex flex-col z-20 transition-all duration-300 ease-in-out h-full shrink-0 overflow-hidden',
           sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:w-0 md:translate-x-0',
         ]"
       >
         <div class="w-64 flex flex-col h-full">
-          <div class="p-4 border-b border-gray-100 flex-shrink-0">
+          <div class="p-4 border-b border-gray-100 shrink-0">
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</p>
           </div>
           <nav class="flex-1 overflow-y-auto py-2">
@@ -98,41 +98,8 @@
               </svg>
               <span class="text-sm font-medium">Entreprises</span>
             </router-link>
-            <div class="px-4 py-4 mt-2">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Ressources Humaines
-              </p>
-            </div>
-            <a
-              href="#"
-              class="flex items-center space-x-3 px-4 py-2 hover:bg-gray-100 text-gray-400 cursor-not-allowed"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
-              </svg>
-              <span class="text-sm font-medium">Employés (Bientôt)</span>
-            </a>
-            <a
-              href="#"
-              class="flex items-center space-x-3 px-4 py-2 hover:bg-gray-100 text-gray-400 cursor-not-allowed"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                ></path>
-              </svg>
-              <span class="text-sm font-medium">Congés (Bientôt)</span>
-            </a>
           </nav>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex-shrink-0">
+          <div class="p-4 bg-gray-50 border-t border-gray-100 shrink-0">
             <div class="bg-blue-50 p-3 rounded-lg">
               <p class="text-xs text-[#0078d4] font-medium">Besoin d'aide ?</p>
               <p class="text-[10px] text-gray-600 mt-1">
