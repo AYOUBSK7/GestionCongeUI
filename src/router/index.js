@@ -41,7 +41,7 @@ const router = createRouter({
       path: '/employee/dashboard',
       name: 'employee-dashboard',
       component: EmployeeDashboard,
-      meta: { requiresAuth: true, role: 'employe' },
+      meta: { requiresAuth: true, role: 'user' },
     },
   ],
 })
