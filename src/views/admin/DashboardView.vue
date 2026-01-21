@@ -29,10 +29,10 @@
           <div
             class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center font-bold text-xs"
           >
-            {{ authStore.user?.prenom?.[0] }}{{ authStore.user?.nom?.[0] }}
+            {{ authStore.user?.prenom?.[0] || '' }}{{ authStore.user?.nom?.[0] || '' }}
           </div>
           <span class="hidden sm:inline"
-            >{{ authStore.user?.prenom }} {{ authStore.user?.nom }}</span
+            >{{ authStore.user?.prenom || '' }} {{ authStore.user?.nom || '' }}</span
           >
         </div>
         <button @click="handleLogout" class="p-1 hover:bg-azure-hover rounded" title="Déconnexion">
@@ -172,7 +172,7 @@
                   </svg>
                 </div>
               </div>
-              <p class="text-3xl font-light text-gray-800">2</p>
+              <p class="text-3xl font-light text-gray-800">{{ entreprisesCount }}</p>
               <p class="text-xs text-green-600 mt-2 flex items-center">
                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -201,7 +201,7 @@
                   </svg>
                 </div>
               </div>
-              <p class="text-3xl font-light text-gray-800">12</p>
+              <p class="text-3xl font-light text-gray-800">{{ employesCount }}</p>
               <p class="text-xs text-gray-500 mt-2">Total across all companies</p>
             </div>
 
@@ -261,8 +261,8 @@
               </div>
               <div class="space-y-4">
                 <div
-                  v-for="i in 2"
-                  :key="i"
+                  v-for="ent in recentEntreprises"
+                  :key="ent.id"
                   class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 transition-all"
                 >
                   <div class="flex items-center space-x-3">
@@ -279,18 +279,20 @@
                       </svg>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-800">
-                        {{ i === 1 ? 'Tech Solutions SARL' : 'Global Logistics' }}
-                      </p>
-                      <p class="text-[10px] text-gray-500">
-                        {{ i === 1 ? 'Tunis, Tunisie' : 'Sfax, Tunisie' }}
-                      </p>
+                      <p class="text-sm font-medium text-gray-800">{{ ent.nom }}</p>
+                      <p class="text-[10px] text-gray-500">{{ ent.adresse }}</p>
                     </div>
                   </div>
                   <span
                     class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-semibold rounded uppercase"
                     >Actif</span
                   >
+                </div>
+                <div
+                  v-if="recentEntreprises.length === 0"
+                  class="text-center text-gray-500 text-sm py-4"
+                >
+                  Aucune entreprise
                 </div>
               </div>
             </div>
@@ -363,13 +365,62 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import { authService } from '../../services/authService'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const sidebarOpen = ref(true)
+const entreprisesCount = ref(0)
+const employesCount = ref(0)
+const loading = ref(true)
+const entreprises = ref([])
+
+// FIX: Calculer les 2 dernières entreprises pour l'affichage
+const recentEntreprises = computed(() => {
+  return entreprises.value.slice(0, 2)
+})
+
+const loadStats = async () => {
+  if (!authStore.user?.id) {
+    console.error('No user ID available')
+    return
+  }
+
+  try {
+    const adminId = authStore.user.id
+    console.log('Loading stats for admin:', adminId)
+
+    // FIX: Charger les entreprises
+    entreprises.value = await authService.getEntreprises(adminId)
+    entreprisesCount.value = entreprises.value.length
+
+    // FIX: Charger tous les employés de toutes les entreprises
+    let totalEmployes = 0
+    for (const ent of entreprises.value) {
+      try {
+        const employes = await authService.getEmployes(adminId, ent.id)
+        totalEmployes += employes.length
+      } catch (err) {
+        console.error(`Error loading employees for entreprise ${ent.id}:`, err)
+      }
+    }
+    employesCount.value = totalEmployes
+  } catch (error) {
+    console.error('Error loading dashboard stats:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(async () => {
+  if (!authStore.user) {
+    await authStore.fetchUser()
+  }
+  loadStats()
+})
 
 const handleLogout = () => {
   authStore.logout()

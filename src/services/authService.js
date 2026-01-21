@@ -34,39 +34,49 @@ export const authService = {
     }
     return response.data
   },
+
   async register(registerDto) {
     const response = await api.post('/api/Account/register', registerDto)
     return response.data
   },
+
   async getMe() {
     const response = await api.get('/api/Account/me')
     return response.data
   },
+
   // Entreprises API
   async getEntreprises(adminId) {
     const response = await api.get(`/api/administrateur/${adminId}/entreprises`)
     return response.data
   },
+
+  async getEntreprise(adminId, entrepriseId) {
+    const response = await api.get(`/api/administrateur/${adminId}/entreprises/${entrepriseId}`)
+    return response.data
+  },
+
   async addEntreprise(adminId, entrepriseData) {
     if (!adminId) {
       console.error('addEntreprise called with null adminId')
       throw new Error('Admin ID is required')
     }
     const payload = {
-      Nom: entrepriseData.nom,
-      Adresse: entrepriseData.adresse,
-      Tel: entrepriseData.tel,
-      Email: entrepriseData.email,
+      nom: entrepriseData.nom,
+      adresse: entrepriseData.adresse,
+      telephone: entrepriseData.telephone, // FIX: était 'tel'
+      email: entrepriseData.email,
     }
     const response = await api.post(`/api/administrateur/${adminId}/entreprises`, payload)
     return response.data
   },
+
   async updateEntreprise(adminId, entrepriseId, entrepriseData) {
     const payload = {
-      Nom: entrepriseData.nom,
-      Adresse: entrepriseData.adresse,
-      Tel: entrepriseData.tel,
-      Email: entrepriseData.email,
+      nom: entrepriseData.nom,
+      adresse: entrepriseData.adresse,
+      telephone: entrepriseData.telephone, // FIX: était 'tel'
+      email: entrepriseData.email,
     }
     const response = await api.put(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}`,
@@ -74,10 +84,181 @@ export const authService = {
     )
     return response.data
   },
+
   async deleteEntreprise(adminId, entrepriseId) {
     const response = await api.delete(`/api/administrateur/${adminId}/entreprises/${entrepriseId}`)
     return response.data
   },
+
+  // Employes API
+  async getEmployes(adminId, entrepriseId) {
+    const response = await api.get(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes`,
+    )
+    const data = Array.isArray(response.data) ? response.data : []
+    // FIX: Backend renvoie en PascalCase
+    return data.map((e) => ({
+      id: e.id,
+      nom: e.nom,
+      prenom: e.prenom,
+      email: e.email,
+    }))
+  },
+
+  async getEmployeDetail(adminId, entrepriseId, employeId) {
+    try {
+      const response = await api.get(
+        `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/detail`,
+      )
+      const e = response.data
+      if (!e) return null
+
+      // FIX: Backend renvoie en camelCase
+      return {
+        id: e.id,
+        nom: e.nom,
+        prenom: e.prenom,
+        email: e.email,
+        adresse: e.adresse,
+        identifiant: e.identifiant,
+        soldeConges: e.soldeConges,
+        telephonePrincipal: e.telephonePrincipal,
+        telephoneSecondaire: e.telephoneSecondaire,
+        contrat: e.contrat || null,
+        poste: e.poste || null,
+        permissions: e.permissions || [],
+        salaires: e.salaires || [],
+      }
+    } catch (error) {
+      console.error('Error fetching employee detail:', error)
+      throw error
+    }
+  },
+
+  async addEmploye(adminId, entrepriseId, employeData) {
+    const payload = {
+      nomUtilisateur: employeData.nomUtilisateur,
+      email: employeData.email,
+      motDePasse: employeData.motDePasse,
+      prenom: employeData.prenom,
+      nom: employeData.nom,
+      adresse: employeData.adresse || '',
+      identifiant: employeData.identifiant,
+      soldeConge: parseInt(employeData.soldeConge) || 0,
+      telephonePrincipal: employeData.telephonePrincipal || null,
+      telephoneSecondaire: employeData.telephoneSecondaire || null,
+    }
+    const response = await api.post(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes`,
+      payload,
+    )
+    return response.data
+  },
+
+  async addContrat(adminId, entrepriseId, employeId, contratData) {
+    const payload = {
+      typeContrat: contratData.type,
+      dateDebut: contratData.debut,
+      dateFin: contratData.fin || null,
+    }
+    const response = await api.post(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/contrats`,
+      payload,
+    )
+    return response.data
+  },
+
+  async addPoste(adminId, entrepriseId, employeId, posteData) {
+    const payload = {
+      titre: posteData.titre,
+      dateDebut: posteData.debut,
+      dateFin: posteData.fin || null,
+    }
+    const response = await api.post(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/postes`,
+      payload,
+    )
+    return response.data
+  },
+
+  async addSalaire(adminId, entrepriseId, employeId, salaireData) {
+    const payload = {
+      montant: parseFloat(salaireData.montant),
+      dateDebut: salaireData.debut,
+      dateFin: salaireData.fin || null,
+    }
+    const response = await api.post(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/salaires`,
+      payload,
+    )
+    return response.data
+  },
+
+  async addPermission(adminId, entrepriseId, employeId, permissionName) {
+    const payload = {
+      nomPermission: permissionName,
+    }
+    const response = await api.post(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/permissions`,
+      payload,
+    )
+    return response.data
+  },
+
+  async updateEmploye(adminId, entrepriseId, employeId, employeData) {
+    const payload = {
+      nom: employeData.nom,
+      prenom: employeData.prenom,
+      email: employeData.email,
+      soldeConge: employeData.soldeConge,
+      adresse: employeData.adresse || null,
+      telephonePrincipal: employeData.telephonePrincipal || null,
+      telephoneSecondaire: employeData.telephoneSecondaire || null,
+    }
+    const response = await api.put(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}`,
+      payload,
+    )
+    return response.data
+  },
+
+  async getPostes(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/postes`)
+    return response.data
+  },
+
+  async getContrats(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/contrats`)
+    return response.data
+  },
+
+  async getSalaires(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/salaires`)
+    return response.data
+  },
+
+  async deleteEmploye(adminId, entrepriseId, employeId) {
+    const response = await api.delete(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}`,
+    )
+    return response.data
+  },
+
+  async getConges(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/conges`)
+    return response.data
+  },
+
+  async getAvances(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/avances`)
+    return response.data
+  },
+
+  async getAbsences(employeId) {
+    const response = await api.get(`/api/employes/${employeId}/absences`)
+    return response.data
+  },
+
   logout() {
     Cookies.remove('token')
   },

@@ -43,7 +43,7 @@
             <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider"
               >Téléphone</label
             >
-            <input v-model="form.tel" type="text" class="ms-input" required />
+            <input v-model="form.telephone" type="text" class="ms-input" required />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider"
@@ -83,7 +83,7 @@
                 <path
                   class="opacity-75"
                   fill="currentColor"
-                  d="4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
               {{ loading ? 'Enregistrement...' : 'Enregistrer les modifications' }}
@@ -109,7 +109,7 @@ const emit = defineEmits(['close', 'submit'])
 const form = reactive({
   nom: '',
   adresse: '',
-  tel: '',
+  telephone: '', // FIX: était 'tel'
   email: '',
 })
 
@@ -119,7 +119,7 @@ watch(
     if (newVal) {
       form.nom = newVal.nom || ''
       form.adresse = newVal.adresse || ''
-      form.tel = newVal.tel || ''
+      form.telephone = newVal.telephone || '' // FIX: était 'tel'
       form.email = newVal.email || ''
     }
   },

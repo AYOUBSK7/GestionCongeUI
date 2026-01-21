@@ -56,7 +56,7 @@
               >Téléphone</label
             >
             <input
-              v-model="form.tel"
+              v-model="form.telephone"
               type="text"
               placeholder="ex: +216 71 000 000"
               class="ms-input"
@@ -131,7 +131,7 @@ const emit = defineEmits(['close', 'submit'])
 const form = reactive({
   nom: '',
   adresse: '',
-  tel: '',
+  telephone: '',
   email: '',
 })
 
@@ -141,13 +141,14 @@ watch(
     if (newVal) {
       form.nom = ''
       form.adresse = ''
-      form.tel = ''
+      form.telephone = ''
       form.email = ''
     }
   },
 )
 
 const handleSubmit = () => {
+  console.log('Submitting form:', { ...form })
   emit('submit', { ...form })
 }
 </script>

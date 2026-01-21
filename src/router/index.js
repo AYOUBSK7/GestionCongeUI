@@ -38,6 +38,18 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
+      path: '/admin/entreprises/:id',
+      name: 'admin-entreprise-employes',
+      component: () => import('../views/admin/employes/EmployeListView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/admin/entreprises/:entrepriseId/employes/:employeId/manage',
+      name: 'admin-manage-employe',
+      component: () => import('../views/admin/employes/ManageEmployeView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
       path: '/employee/dashboard',
       name: 'employee-dashboard',
       component: EmployeeDashboard,
@@ -63,8 +75,11 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    const userRole = (authStore.user.role || '').toLowerCase()
+    // FIX: Utiliser authStore.user.role directement
+    const userRole = (authStore.user?.role || '').toLowerCase()
     const requiredRole = (to.meta.role || '').toLowerCase()
+
+    console.log('Router guard - User role:', userRole, 'Required role:', requiredRole)
 
     if (requiredRole && userRole !== requiredRole) {
       return next(userRole === 'admin' ? '/admin/dashboard' : '/employee/dashboard')

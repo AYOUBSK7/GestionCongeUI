@@ -32,10 +32,20 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await authService.getMe()
         console.log('Fetched user raw:', user)
-        if (user && user.id && !user.Id) {
-          user.Id = user.id
+
+        // FIX: Normaliser le format du user
+        this.user = {
+          id: user.id,
+          userName: user.userName,
+          email: user.email,
+          nom: user.nom,
+          prenom: user.prenom,
+          role: user.role, // Le backend renvoie 'role' en minuscule
+          telephonePrincipal: user.telephonePrincipal,
+          telephoneSecondaire: user.telephoneSecondaire,
         }
-        this.user = user
+
+        console.log('User normalized:', this.user)
       } catch (err) {
         console.error('Fetch user error:', err)
         this.logout()

@@ -10,6 +10,7 @@
         <!-- Informations Personnelles -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
           <input v-model="form.nom" type="text" placeholder="Nom" class="input-azure" required />
+
           <input
             v-model="form.prenom"
             type="text"
@@ -17,6 +18,7 @@
             class="input-azure"
             required
           />
+
           <input
             v-model="form.email"
             type="email"
@@ -24,7 +26,23 @@
             class="input-azure"
             required
           />
+
           <input v-model="form.adresse" type="text" placeholder="Adresse" class="input-azure" />
+
+          <!-- 🔹 AJOUT -->
+          <input
+            v-model="form.telephonePrincipal"
+            type="tel"
+            placeholder="Téléphone principal"
+            class="input-azure"
+          />
+
+          <input
+            v-model="form.telephoneSecondaire"
+            type="tel"
+            placeholder="Téléphone secondaire"
+            class="input-azure"
+          />
         </div>
 
         <hr class="border-gray-100 my-2" />
@@ -38,6 +56,7 @@
             class="input-azure"
             required
           />
+
           <input
             v-model="form.identifiant"
             type="text"
@@ -46,6 +65,7 @@
             required
           />
         </div>
+
         <input
           v-model="form.motDePasse"
           type="password"
@@ -57,14 +77,16 @@
         <div v-if="error" class="text-red-600 text-sm">
           {{ error }}
         </div>
+
         <div v-if="success" class="text-green-600 text-sm">
           {{ success }}
         </div>
 
         <div class="flex items-center justify-between pt-2">
-          <router-link to="/login" class="text-sm text-gray-600 hover:underline"
-            >Déjà un compte ?</router-link
-          >
+          <router-link to="/login" class="text-sm text-gray-600 hover:underline">
+            Déjà un compte ?
+          </router-link>
+
           <button
             type="submit"
             :disabled="loading"
@@ -85,13 +107,15 @@ import { authService } from '../services/authService'
 
 const router = useRouter()
 const form = reactive({
-  nomUtilisateur: '',
-  email: '',
-  motDePasse: '',
   prenom: '',
   nom: '',
+  email: '',
   adresse: '',
   identifiant: '',
+  nomUtilisateur: '',
+  motDePasse: '',
+  telephonePrincipal: '',
+  telephoneSecondaire: '',
 })
 
 const loading = ref(false)

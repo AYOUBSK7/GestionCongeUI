@@ -7,7 +7,7 @@
         <span>Espace Employé</span>
       </div>
       <div class="flex items-center space-x-4">
-        <span>{{ authStore.user?.Prenom }} {{ authStore.user?.Nom }}</span>
+        <span>{{ authStore.user?.prenom }} {{ authStore.user?.nom }}</span>
         <button @click="handleLogout" class="hover:text-gray-300">Déconnexion</button>
       </div>
     </nav>

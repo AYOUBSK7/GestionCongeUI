@@ -8,7 +8,7 @@
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <input
-            v-model="form.userName"
+            v-model="form.nomUtilisateur"
             type="text"
             placeholder="E-mail ou Identifiant"
             class="input-azure"
@@ -18,7 +18,7 @@
 
         <div>
           <input
-            v-model="form.password"
+            v-model="form.motDePasse"
             type="password"
             placeholder="Mot de passe"
             class="input-azure"
@@ -60,8 +60,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const form = reactive({
-  userName: '',
-  password: '',
+  nomUtilisateur: '',
+  motDePasse: '',
 })
 
 const loading = ref(false)
@@ -72,18 +72,26 @@ const handleLogin = async () => {
   error.value = null
   try {
     const user = await authStore.login({
-      UserName: form.userName,
-      Password: form.password,
+      nomUtilisateur: form.nomUtilisateur,
+      motDePasse: form.motDePasse,
     })
-    console.log('User role:', user.Role)
-    const role = (user.Role || '').toLowerCase()
+
+    console.log('User logged in:', user)
+
+    // FIX: Utiliser user.role au lieu de user.Role
+    const role = (user?.role || '').toLowerCase()
+
     if (role === 'admin') {
       router.push('/admin/dashboard')
-    } else {
+    } else if (role === 'user') {
       router.push('/employee/dashboard')
+    } else {
+      // Fallback si le rôle n'est pas reconnu
+      error.value = 'Rôle utilisateur non reconnu'
     }
   } catch (err) {
-    error.value = 'Identifiants incorrects'
+    console.error('Login error:', err)
+    error.value = err.response?.data?.message || 'Identifiants incorrects'
   } finally {
     loading.value = false
   }

@@ -264,7 +264,7 @@
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     ></path>
                   </svg>
-                  <span>{{ ent.tel }}</span>
+                  <span>{{ ent.telephone }}</span>
                 </div>
                 <div class="flex items-start text-sm text-gray-600">
                   <svg
@@ -293,7 +293,7 @@
                 class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center"
               >
                 <router-link
-                  :to="`/admin/entreprises/${ent.Id}`"
+                  :to="`/admin/entreprises/${ent.id}`"
                   class="text-[#0078d4] text-xs font-bold hover:underline uppercase tracking-wider"
                 >
                   Gérer les employés
@@ -500,13 +500,14 @@ const modalLoading = ref(false)
 const entreprises = ref([])
 
 const loadEntreprises = async () => {
-  const adminId = authStore.user?.Id || authStore.user?.id
+  const adminId = authStore.user?.id
   if (adminId === undefined || adminId === null) {
     return
   }
   loading.value = true
   try {
     entreprises.value = await authService.getEntreprises(adminId)
+    console.log('Loaded entreprises:', entreprises.value)
   } catch (error) {
     console.error('Error loading entreprises:', error)
   } finally {
@@ -517,7 +518,7 @@ const loadEntreprises = async () => {
 const handleAddSubmit = async (formData) => {
   modalLoading.value = true
   try {
-    const adminId = authStore.user?.Id || authStore.user?.id
+    const adminId = authStore.user?.id
     if (adminId === undefined || adminId === null) {
       console.error('Admin ID is missing', authStore.user)
       return
@@ -540,8 +541,8 @@ const openEditModal = (entreprise) => {
 const handleEditSubmit = async (formData) => {
   modalLoading.value = true
   try {
-    const adminId = authStore.user?.Id || authStore.user?.id
-    const entrepriseId = currentEntreprise.value?.Id || currentEntreprise.value?.id
+    const adminId = authStore.user?.id
+    const entrepriseId = currentEntreprise.value?.id
     if (!adminId || !entrepriseId) {
       console.error('Missing IDs for update:', { adminId, entrepriseId })
       return
@@ -559,7 +560,7 @@ const handleEditSubmit = async (formData) => {
 const removeEntreprise = async (id) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette entreprise ?')) {
     try {
-      const adminId = authStore.user?.Id || authStore.user?.id
+      const adminId = authStore.user?.id
       if (!adminId) {
         console.error('Admin ID is missing for delete')
         return
