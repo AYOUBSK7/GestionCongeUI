@@ -172,16 +172,9 @@
                   </svg>
                 </div>
               </div>
-              <p class="text-3xl font-light text-gray-800">{{ entreprisesCount }}</p>
-              <p class="text-xs text-green-600 mt-2 flex items-center">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M12 7l-1.2 1.2L12.8 10H5v2h7.8l-2 2L12 15.2l4-4-4-4z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-                Actives
+              <p class="text-3xl font-light text-gray-800">{{ entreprises.length }}</p>
+              <p class="text-xs text-blue-600 mt-2 flex items-center">
+                Total des entreprises
               </p>
             </div>
 
@@ -201,53 +194,84 @@
                   </svg>
                 </div>
               </div>
-              <p class="text-3xl font-light text-gray-800">{{ employesCount }}</p>
-              <p class="text-xs text-gray-500 mt-2">Total across all companies</p>
+              <p class="text-3xl font-light text-gray-800">{{ totalEmployesCount }}</p>
+              <p class="text-xs text-purple-600 mt-2">Total des employés</p>
             </div>
 
             <div
               class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm hover:shadow-md transition-shadow"
             >
               <div class="flex items-center justify-between mb-4">
-                <span class="text-gray-500 text-xs font-semibold uppercase">Congés en attente</span>
+                <span class="text-gray-500 text-xs font-semibold uppercase">Alertes Contrats</span>
+                <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+              <p class="text-3xl font-light text-gray-800">{{ alertesContrats.length }}</p>
+              <p class="text-xs text-red-600 mt-2">Fin de contrat proche</p>
+            </div>
+
+            <div
+              class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm hover:shadow-md transition-shadow"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-500 text-xs font-semibold uppercase">Alertes Postes</span>
                 <div class="p-2 bg-orange-50 text-orange-600 rounded-lg">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                     ></path>
                   </svg>
                 </div>
               </div>
-              <p class="text-3xl font-light text-gray-800">5</p>
-              <p class="text-xs text-orange-600 mt-2">Nécessite votre attention</p>
-            </div>
-
-            <div
-              class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm hover:shadow-md transition-shadow"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-gray-500 text-xs font-semibold uppercase">Approuvés ce mois</span>
-                <div class="p-2 bg-green-50 text-green-600 rounded-lg">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-              <p class="text-3xl font-light text-gray-800">24</p>
-              <p class="text-xs text-green-600 mt-2">Validés avec succès</p>
+              <p class="text-3xl font-light text-gray-800">{{ alertesPostes.length }}</p>
+              <p class="text-xs text-orange-600 mt-2">Fin de mission proche</p>
             </div>
           </div>
 
           <!-- Secondary Section -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6">
+            <!-- Alerts Detail Panel -->
+            <div
+              v-if="alertesContrats.length > 0 || alertesPostes.length > 0"
+              class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm"
+            >
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="font-semibold text-gray-800">Détails des alertes critiques</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-if="alertesContrats.length > 0" class="space-y-2">
+                  <h4 class="text-xs font-bold text-red-600 uppercase tracking-wider">Contrats expirant bientôt</h4>
+                  <div v-for="(alerte, index) in alertesContrats" :key="'contrat-' + index" class="p-3 bg-red-50 border border-red-100 rounded-lg flex justify-between items-center">
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">{{ alerte.employeNom }}</p>
+                      <p class="text-[10px] text-gray-500">{{ alerte.typeContrat }} - {{ alerte.entrepriseNom }}</p>
+                    </div>
+                    <span class="text-xs font-semibold text-red-700">{{ new Date(alerte.dateFin).toLocaleDateString() }}</span>
+                  </div>
+                </div>
+                <div v-if="alertesPostes.length > 0" class="space-y-2">
+                  <h4 class="text-xs font-bold text-orange-600 uppercase tracking-wider">Postes expirant bientôt</h4>
+                  <div v-for="(alerte, index) in alertesPostes" :key="'poste-' + index" class="p-3 bg-orange-50 border border-orange-100 rounded-lg flex justify-between items-center">
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">{{ alerte.employeNom }}</p>
+                      <p class="text-[10px] text-gray-500">{{ alerte.titrePoste }} - {{ alerte.entrepriseNom }}</p>
+                    </div>
+                    <span class="text-xs font-semibold text-orange-700">{{ new Date(alerte.dateFin).toLocaleDateString() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div
               class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm hover:shadow-md transition-shadow"
             >
@@ -259,15 +283,19 @@
                   >Voir tout</router-link
                 >
               </div>
-              <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div
                   v-for="ent in recentEntreprises"
                   :key="ent.id"
-                  class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 transition-all"
+                  :class="[
+                    'flex items-center justify-between p-3 rounded-lg border transition-all relative bg-gray-50 border-transparent hover:border-gray-100',
+                  ]"
                 >
                   <div class="flex items-center space-x-3">
                     <div
-                      class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-[#0078d4]"
+                      :class="[
+                        'w-10 h-10 rounded flex items-center justify-center bg-gray-100 text-[#0078d4]',
+                      ]"
                     >
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -279,82 +307,29 @@
                       </svg>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-800">{{ ent.nom }}</p>
+                      <p :class="['text-sm font-medium text-gray-800']">
+                        {{ ent.nom }}
+                      </p>
                       <p class="text-[10px] text-gray-500">{{ ent.adresse }}</p>
                     </div>
                   </div>
                   <span
+                    v-if="ent.statut === 'Actif'"
                     class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-semibold rounded uppercase"
-                    >Actif</span
+                    >{{ ent.statut }}</span
+                  >
+                  <span
+                    v-else
+                    class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-semibold rounded uppercase"
+                    >{{ ent.statut }}</span
                   >
                 </div>
-                <div
-                  v-if="recentEntreprises.length === 0"
-                  class="text-center text-gray-500 text-sm py-4"
-                >
-                  Aucune entreprise
-                </div>
               </div>
-            </div>
-
-            <div
-              class="bg-white shadow-sm border border-gray-200 p-5 rounded-sm hover:shadow-md transition-shadow"
-            >
-              <div class="flex items-center justify-between mb-6">
-                <h3 class="font-semibold text-gray-800">Prochaines étapes</h3>
-              </div>
-              <div class="space-y-3">
-                <div
-                  class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100"
-                >
-                  <div class="mt-1">
-                    <svg
-                      class="w-4 h-4 text-[#0078d4]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div class="flex-1">
-                    <p class="text-xs font-medium text-[#0078d4]">Configuration requise</p>
-                    <p class="text-[10px] text-gray-600 mt-0.5">
-                      Veuillez configurer les droits d'accès pour les nouveaux supérieurs
-                      hiérarchiques.
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-100"
-                >
-                  <div class="mt-1">
-                    <svg
-                      class="w-4 h-4 text-orange-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div class="flex-1">
-                    <p class="text-xs font-medium text-orange-600">Avances salariales</p>
-                    <p class="text-[10px] text-gray-600 mt-0.5">
-                      3 nouvelles demandes d'avances attendent votre validation.
-                    </p>
-                  </div>
-                </div>
+              <div
+                v-if="recentEntreprises.length === 0"
+                class="text-center text-gray-500 text-sm py-4"
+              >
+                Aucune entreprise
               </div>
             </div>
           </div>
@@ -373,41 +348,41 @@ import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 const sidebarOpen = ref(true)
-const entreprisesCount = ref(0)
-const employesCount = ref(0)
-const loading = ref(true)
 const entreprises = ref([])
+const totalEmployesCount = ref(0)
+const loading = ref(true)
+const alertesContrats = ref([])
+const alertesPostes = ref([])
 
-// FIX: Calculer les 2 dernières entreprises pour l'affichage
 const recentEntreprises = computed(() => {
-  return entreprises.value.slice(0, 2)
+  return entreprises.value.slice(0, 5)
 })
 
 const loadStats = async () => {
-  if (!authStore.user?.id) {
-    console.error('No user ID available')
-    return
-  }
+  if (!authStore.user?.id) return
 
   try {
     const adminId = authStore.user.id
-    console.log('Loading stats for admin:', adminId)
-
-    // FIX: Charger les entreprises
     entreprises.value = await authService.getEntreprises(adminId)
-    entreprisesCount.value = entreprises.value.length
 
-    // FIX: Charger tous les employés de toutes les entreprises
-    let totalEmployes = 0
-    for (const ent of entreprises.value) {
-      try {
-        const employes = await authService.getEmployes(adminId, ent.id)
-        totalEmployes += employes.length
-      } catch (err) {
-        console.error(`Error loading employees for entreprise ${ent.id}:`, err)
-      }
+    // Charger les détails des expirations depuis l'API
+    try {
+      const data = await authService.getExpirations(adminId)
+      // On mappe directement les listes reçues
+      alertesContrats.value = data.contrats || []
+      alertesPostes.value = data.postes || []
+    } catch (err) {
+      console.error('Error loading expiration details:', err)
     }
-    employesCount.value = totalEmployes
+
+    let totalEmps = 0
+    for (const ent of entreprises.value) {
+      const emps = await authService.getEmployes(adminId, ent.id)
+      totalEmps += emps.length
+    }
+
+    totalEmployesCount.value = totalEmps
+
   } catch (error) {
     console.error('Error loading dashboard stats:', error)
   } finally {

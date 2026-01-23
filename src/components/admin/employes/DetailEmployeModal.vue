@@ -114,13 +114,9 @@
               >
                 <span class="text-gray-600">
                   {{ formatDate(s.dateDebut) }}
-                  <span v-if="s.DateFin || s.dateFin">
-                    - {{ formatDate(s.dateFin) }}</span
-                  >
+                  <span v-if="s.dateFin"> - {{ formatDate(s.dateFin) }}</span>
                 </span>
-                <span class="font-bold text-gray-800"
-                  >{{ s.montantSalaire || s.montant }} TND</span
-                >
+                <span class="font-bold text-gray-800">{{ s.montantSalaire }} TND</span>
               </div>
             </div>
             <p v-else class="text-sm text-gray-400 italic">Aucun historique de salaire</p>
@@ -137,6 +133,8 @@ const props = defineProps({
   show: Boolean,
   employe: Object,
 })
+
+console.log(props.employe)
 
 defineEmits(['close'])
 

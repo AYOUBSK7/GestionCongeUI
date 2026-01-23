@@ -51,41 +51,40 @@
             >
             <textarea v-model="form.adresse" class="ms-input min-h-[80px]" required></textarea>
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+              Statut
+            </label>
+
+            <div class="flex items-center gap-4">
+              <!-- Switch -->
+              <button
+                type="button"
+                @click="form.statut = form.statut == 'Actif' ? 'Inactif' : 'Actif'"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300"
+                :class="form.statut == 'Actif' ? 'bg-green-600' : 'bg-gray-300'"
+              >
+                <span
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300"
+                  :class="form.statut == 'Actif' ? 'translate-x-6' : 'translate-x-1'"
+                ></span>
+              </button>
+
+              <!-- Text -->
+              <span
+                class="text-xs font-semibold"
+                :class="form.statut == 'Actif' ? 'text-green-600' : 'text-gray-500'"
+              >
+                {{ form.statut }}
+              </span>
+            </div>
+          </div>
 
           <div class="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              @click="$emit('close')"
-              class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-colors"
-            >
+            <button type="button" @click="$emit('close')" class="ms-button-secondary">
               Annuler
             </button>
-            <button
-              type="submit"
-              :disabled="loading"
-              class="ms-button text-xs font-semibold flex items-center gap-2"
-            >
-              <svg
-                v-if="loading"
-                class="animate-spin h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
+            <button type="submit" :disabled="loading" class="ms-button">
               {{ loading ? 'Enregistrement...' : 'Enregistrer les modifications' }}
             </button>
           </div>
@@ -107,10 +106,11 @@ const props = defineProps({
 const emit = defineEmits(['close', 'submit'])
 
 const form = reactive({
-  nom: '',
-  adresse: '',
-  telephone: '', // FIX: était 'tel'
-  email: '',
+  nom: props.entreprise?.nom || '',
+  adresse: props.entreprise?.adresse || '',
+  telephone: props.entreprise?.telephone || '',
+  email: props.entreprise?.email || '',
+  statut: props.entreprise?.statut,
 })
 
 watch(
@@ -121,6 +121,7 @@ watch(
       form.adresse = newVal.adresse || ''
       form.telephone = newVal.telephone || '' // FIX: était 'tel'
       form.email = newVal.email || ''
+      form.statut = newVal.statut
     }
   },
   { immediate: true },

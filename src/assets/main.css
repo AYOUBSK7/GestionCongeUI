@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-azure-blue: #0067b8;
@@ -11,6 +11,44 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   background-color: #f2f2f2;
+}
+
+@layer components {
+  .ms-button {
+    @apply bg-[#0078d4] text-white px-4 py-1.5 text-sm font-semibold hover:bg-[#106ebe] active:bg-[#005a9e] transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+  }
+
+  .ms-button-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 px-4 py-1.5 text-sm font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+  }
+
+  .ms-button-danger {
+    @apply bg-white text-red-600 border border-red-600 px-4 py-1.5 text-sm font-semibold hover:bg-red-50 active:bg-red-100 transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+  }
+
+  .ms-button-success {
+    @apply bg-[#107c10] text-white px-4 py-1.5 text-sm font-semibold hover:bg-[#0b5a0b] active:bg-[#094509] transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+  }
+
+  .ms-input {
+    @apply w-full border border-gray-300 px-3 py-1.5 text-sm focus:border-[#0078d4] focus:outline-none transition-colors rounded-sm;
+  }
+}
+
+.ms-button-secondary {
+  @apply bg-white text-gray-700 border border-gray-300 px-4 py-1.5 text-sm font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+}
+
+.ms-button-danger {
+  @apply bg-white text-red-600 border border-red-600 px-4 py-1.5 text-sm font-semibold hover:bg-red-50 active:bg-red-100 transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+}
+
+.ms-button-success {
+  @apply bg-[#107c10] text-white px-4 py-1.5 text-sm font-semibold hover:bg-[#0b5a0b] active:bg-[#094509] transition-colors rounded-sm inline-flex items-center justify-center min-w-[100px];
+}
+
+.ms-input {
+  @apply w-full border border-gray-300 px-3 py-1.5 text-sm focus:border-[#0078d4] focus:outline-none transition-colors rounded-sm;
 }

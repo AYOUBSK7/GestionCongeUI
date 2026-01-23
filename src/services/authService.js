@@ -20,6 +20,7 @@ api.interceptors.request.use((config) => {
 })
 
 export const authService = {
+  // use
   async login(loginDto) {
     const response = await api.post('/api/Account/login', loginDto)
     const token = response.data.token
@@ -35,27 +36,32 @@ export const authService = {
     return response.data
   },
 
+  // use
   async register(registerDto) {
     const response = await api.post('/api/Account/register', registerDto)
     return response.data
   },
 
+  // use
   async getMe() {
     const response = await api.get('/api/Account/me')
     return response.data
   },
 
   // Entreprises API
+  // use
   async getEntreprises(adminId) {
     const response = await api.get(`/api/administrateur/${adminId}/entreprises`)
     return response.data
   },
 
+  // use
   async getEntreprise(adminId, entrepriseId) {
     const response = await api.get(`/api/administrateur/${adminId}/entreprises/${entrepriseId}`)
     return response.data
   },
 
+  // use
   async addEntreprise(adminId, entrepriseData) {
     if (!adminId) {
       console.error('addEntreprise called with null adminId')
@@ -71,12 +77,14 @@ export const authService = {
     return response.data
   },
 
+  // use
   async updateEntreprise(adminId, entrepriseId, entrepriseData) {
     const payload = {
       nom: entrepriseData.nom,
       adresse: entrepriseData.adresse,
       telephone: entrepriseData.telephone, // FIX: était 'tel'
       email: entrepriseData.email,
+      statut: entrepriseData.statut,
     }
     const response = await api.put(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}`,
@@ -85,12 +93,8 @@ export const authService = {
     return response.data
   },
 
-  async deleteEntreprise(adminId, entrepriseId) {
-    const response = await api.delete(`/api/administrateur/${adminId}/entreprises/${entrepriseId}`)
-    return response.data
-  },
-
   // Employes API
+  // use
   async getEmployes(adminId, entrepriseId) {
     const response = await api.get(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes`,
@@ -102,9 +106,11 @@ export const authService = {
       nom: e.nom,
       prenom: e.prenom,
       email: e.email,
+      role: e.roleEmploye,
     }))
   },
 
+  // use
   async getEmployeDetail(adminId, entrepriseId, employeId) {
     try {
       const response = await api.get(
@@ -124,10 +130,10 @@ export const authService = {
         soldeConges: e.soldeConges,
         telephonePrincipal: e.telephonePrincipal,
         telephoneSecondaire: e.telephoneSecondaire,
+        salaires: e.salaires,
         contrat: e.contrat || null,
         poste: e.poste || null,
         permissions: e.permissions || [],
-        salaires: e.salaires || [],
       }
     } catch (error) {
       console.error('Error fetching employee detail:', error)
@@ -135,6 +141,7 @@ export const authService = {
     }
   },
 
+  // use
   async addEmploye(adminId, entrepriseId, employeData) {
     const payload = {
       nomUtilisateur: employeData.nomUtilisateur,
@@ -144,6 +151,7 @@ export const authService = {
       nom: employeData.nom,
       adresse: employeData.adresse || '',
       identifiant: employeData.identifiant,
+      superieur: employeData.superieur,
       soldeConge: parseInt(employeData.soldeConge) || 0,
       telephonePrincipal: employeData.telephonePrincipal || null,
       telephoneSecondaire: employeData.telephoneSecondaire || null,
@@ -155,11 +163,13 @@ export const authService = {
     return response.data
   },
 
+  // use
   async addContrat(adminId, entrepriseId, employeId, contratData) {
     const payload = {
       typeContrat: contratData.type,
       dateDebut: contratData.debut,
       dateFin: contratData.fin || null,
+      salaireParMois: parseFloat(contratData.salaireParMois) || 0,
     }
     const response = await api.post(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/contrats`,
@@ -168,6 +178,7 @@ export const authService = {
     return response.data
   },
 
+  // use
   async addPoste(adminId, entrepriseId, employeId, posteData) {
     const payload = {
       titre: posteData.titre,
@@ -181,19 +192,7 @@ export const authService = {
     return response.data
   },
 
-  async addSalaire(adminId, entrepriseId, employeId, salaireData) {
-    const payload = {
-      montant: parseFloat(salaireData.montant),
-      dateDebut: salaireData.debut,
-      dateFin: salaireData.fin || null,
-    }
-    const response = await api.post(
-      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/salaires`,
-      payload,
-    )
-    return response.data
-  },
-
+  // use
   async addPermission(adminId, entrepriseId, employeId, permissionName) {
     const payload = {
       nomPermission: permissionName,
@@ -202,18 +201,28 @@ export const authService = {
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/permissions`,
       payload,
     )
+    console.log('permissions ', response.data)
     return response.data
   },
 
+  // use
+  async deletePermission(adminId, entrepriseId, employeId, permissionName) {
+    const response = await api.delete(
+      `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/permissions/${permissionName}`,
+    )
+    return response.data
+  },
+
+  // use
   async updateEmploye(adminId, entrepriseId, employeId, employeData) {
     const payload = {
       nom: employeData.nom,
       prenom: employeData.prenom,
       email: employeData.email,
-      soldeConge: employeData.soldeConge,
       adresse: employeData.adresse || null,
       telephonePrincipal: employeData.telephonePrincipal || null,
       telephoneSecondaire: employeData.telephoneSecondaire || null,
+      soldeConge: parseInt(employeData.soldeConge) || 0,
     }
     const response = await api.put(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}`,
@@ -222,21 +231,19 @@ export const authService = {
     return response.data
   },
 
+  // use
   async getPostes(employeId) {
     const response = await api.get(`/api/employes/${employeId}/postes`)
     return response.data
   },
 
+  // use
   async getContrats(employeId) {
     const response = await api.get(`/api/employes/${employeId}/contrats`)
     return response.data
   },
 
-  async getSalaires(employeId) {
-    const response = await api.get(`/api/employes/${employeId}/salaires`)
-    return response.data
-  },
-
+  // use
   async deleteEmploye(adminId, entrepriseId, employeId) {
     const response = await api.delete(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}`,
@@ -244,18 +251,11 @@ export const authService = {
     return response.data
   },
 
-  async getConges(employeId) {
-    const response = await api.get(`/api/employes/${employeId}/conges`)
-    return response.data
-  },
-
-  async getAvances(employeId) {
-    const response = await api.get(`/api/employes/${employeId}/avances`)
-    return response.data
-  },
-
-  async getAbsences(employeId) {
-    const response = await api.get(`/api/employes/${employeId}/absences`)
+  // use
+  async getExpirations(adminId, jours = 30) {
+    const response = await api.get(
+      `/api/administrateur/${adminId}/entreprises/expirations?joursAvantExpiration=${jours}`,
+    )
     return response.data
   },
 

@@ -87,17 +87,6 @@
               Gérer Poste
             </button>
             <button
-              @click="activeTab = 'salaire'"
-              :class="[
-                'w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium border-l-4',
-                activeTab === 'salaire'
-                  ? 'bg-blue-50 text-[#0078d4] border-[#0078d4]'
-                  : 'text-gray-700 border-transparent hover:bg-gray-100',
-              ]"
-            >
-              Gérer Salaire
-            </button>
-            <button
               @click="activeTab = 'contrat'"
               :class="[
                 'w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium border-l-4',
@@ -134,10 +123,15 @@
               >
                 {{ employe ? (employe.prenom || '?')[0] + (employe.nom || '?')[0] : '??' }}
               </div>
-              <div>
-                <h2 class="text-xl font-bold text-gray-800">
-                  {{ employe?.prenom }} {{ employe?.nom }}
-                </h2>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-xl font-bold text-gray-800">
+                    {{ employe?.prenom }} {{ employe?.nom }}
+                  </h2>
+                  <button @click="showEditModal = true" class="ms-button-secondary">
+                    Modifier
+                  </button>
+                </div>
                 <p class="text-sm text-gray-500">{{ employe?.email }}</p>
                 <p class="text-xs text-gray-400 mt-1">
                   ID: {{ employe?.identifiant }} | Solde: {{ employe?.soldeConges }} jours
@@ -255,7 +249,10 @@
 
           <!-- Poste Form -->
           <div v-if="activeTab === 'poste'" class="space-y-6">
-            <div class="bg-white p-6 shadow-sm rounded-sm border border-gray-200">
+            <div
+              v-if="IsValidToAddPoste"
+              class="bg-white p-6 shadow-sm rounded-sm border border-gray-200"
+            >
               <h3 class="text-lg font-bold text-gray-800 mb-6">Gérer le poste</h3>
               <form @submit.prevent="submitPoste" class="space-y-4">
                 <div>
@@ -279,7 +276,7 @@
                   </div>
                 </div>
                 <button type="submit" :disabled="loading" class="ms-button w-full">
-                  Enregistrer le poste
+                  Enregistrer
                 </button>
               </form>
             </div>
@@ -360,130 +357,17 @@
             </div>
           </div>
 
-          <!-- Salaire Form -->
-          <div v-if="activeTab === 'salaire'" class="space-y-6">
-            <div class="bg-white p-6 shadow-sm rounded-sm border border-gray-200">
-              <h3 class="text-lg font-bold text-gray-800 mb-6">Gérer le salaire</h3>
-              <form @submit.prevent="submitSalaire" class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                    >Montant (TND)</label
-                  >
-                  <input
-                    v-model="salaireForm.montant"
-                    type="number"
-                    step="0.01"
-                    class="ms-input"
-                    required
-                  />
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                      >Date Début</label
-                    >
-                    <input v-model="salaireForm.dateDebut" type="date" class="ms-input" required />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                      >Date Fin (Optionnel)</label
-                    >
-                    <input v-model="salaireForm.dateFin" type="date" class="ms-input" />
-                  </div>
-                </div>
-                <button type="submit" :disabled="loading" class="ms-button w-full">
-                  Enregistrer le salaire
-                </button>
-              </form>
-            </div>
-
-            <!-- Historique Salaire au dessous -->
-            <div class="bg-white shadow-sm rounded-sm border border-gray-200">
-              <div class="p-4 border-b border-gray-100 bg-gray-50/50">
-                <h3 class="font-bold text-gray-800 uppercase text-xs">Historique des Salaires</h3>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                  <thead>
-                    <tr class="bg-gray-50 text-gray-500 border-b border-gray-100">
-                      <th class="px-6 py-3 font-semibold text-[10px] uppercase">Montant (TND)</th>
-                      <th class="px-6 py-3 font-semibold text-[10px] uppercase">Début</th>
-                      <th class="px-6 py-3 font-semibold text-[10px] uppercase">Fin</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-100">
-                    <tr v-for="s in paginatedSalaires" :key="s.Id || s.id" class="hover:bg-gray-50">
-                      <td class="px-6 py-4 font-bold text-gray-800">
-                        {{ s.MontantSalaire || s.montantSalaire || s.Montant || s.montant }}
-                      </td>
-                      <td class="px-6 py-4">{{ formatDate(s.DateDebut || s.dateDebut) }}</td>
-                      <td class="px-6 py-4">
-                        {{ s.DateFin || s.dateFin ? formatDate(s.DateFin || s.dateFin) : 'Actuel' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div
-                  v-if="history.salaires.length === 0"
-                  class="p-8 text-center text-gray-500 text-xs"
-                >
-                  Aucun historique de salaire
-                </div>
-                <!-- Pagination -->
-                <div
-                  v-if="history.salaires.length > pageSize"
-                  class="p-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/30"
-                >
-                  <span class="text-[10px] text-gray-500 uppercase font-bold"
-                    >Page {{ pagination.salaire }} sur
-                    {{ Math.ceil(history.salaires.length / pageSize) }}</span
-                  >
-                  <div class="flex space-x-2">
-                    <button
-                      @click="pagination.salaire--"
-                      :disabled="pagination.salaire === 1"
-                      class="p-1 disabled:opacity-30"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 19l-7-7 7-7"
-                        ></path>
-                      </svg>
-                    </button>
-                    <button
-                      @click="pagination.salaire++"
-                      :disabled="
-                        pagination.salaire >= Math.ceil(history.salaires.length / pageSize)
-                      "
-                      class="p-1 disabled:opacity-30"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 5l7 7-7 7"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Contrat Form -->
           <div v-if="activeTab === 'contrat'" class="space-y-6">
             <div class="bg-white p-6 shadow-sm rounded-sm border border-gray-200">
               <h3 class="text-lg font-bold text-gray-800 mb-6">Gérer le contrat</h3>
+
               <form @submit.prevent="submitContrat" class="space-y-4">
+                <!-- Type Contrat -->
                 <div>
-                  <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                    >Type de Contrat</label
-                  >
+                  <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Type de Contrat
+                  </label>
                   <select v-model="contratForm.typeContrat" class="ms-input" required>
                     <option value="CDI">CDI</option>
                     <option value="CDD">CDD</option>
@@ -491,148 +375,180 @@
                     <option value="Karama">Karama</option>
                   </select>
                 </div>
+
+                <!-- Salaire Mensuel -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Salaire Mensuel (TND)
+                  </label>
+                  <input
+                    v-model="contratForm.salaireParMois"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="ms-input"
+                    placeholder="ex: 1200"
+                    required
+                  />
+                </div>
+
+                <!-- Dates -->
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                      >Date Début</label
-                    >
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                      Date Début
+                    </label>
                     <input v-model="contratForm.dateDebut" type="date" class="ms-input" required />
                   </div>
+
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                      >Date Fin (Optionnel)</label
-                    >
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                      Date Fin (Optionnel)
+                    </label>
                     <input v-model="contratForm.dateFin" type="date" class="ms-input" />
                   </div>
                 </div>
+
                 <button type="submit" :disabled="loading" class="ms-button w-full">
-                  Enregistrer le contrat
+                  Enregistrer
                 </button>
               </form>
             </div>
 
-            <!-- Historique Contrat au dessous -->
+            <!-- Historique Contrats -->
             <div class="bg-white shadow-sm rounded-sm border border-gray-200">
               <div class="p-4 border-b border-gray-100 bg-gray-50/50">
                 <h3 class="font-bold text-gray-800 uppercase text-xs">Historique des Contrats</h3>
               </div>
+
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                   <thead>
                     <tr class="bg-gray-50 text-gray-500 border-b border-gray-100">
                       <th class="px-6 py-3 font-semibold text-[10px] uppercase">Type</th>
+                      <th class="px-6 py-3 font-semibold text-[10px] uppercase">Salaire</th>
                       <th class="px-6 py-3 font-semibold text-[10px] uppercase">Début</th>
                       <th class="px-6 py-3 font-semibold text-[10px] uppercase">Fin</th>
                     </tr>
                   </thead>
+
                   <tbody class="divide-y divide-gray-100">
-                    <tr v-for="c in paginatedContrats" :key="c.Id || c.id" class="hover:bg-gray-50">
+                    <tr v-for="c in paginatedContrats" :key="c.id || c.Id" class="hover:bg-gray-50">
                       <td class="px-6 py-4 font-medium text-gray-800">
-                        {{ c.TypeContrat || c.typeContrat }}
+                        {{ c.typeContrat || c.TypeContrat }}
                       </td>
-                      <td class="px-6 py-4">{{ formatDate(c.DateDebut || c.dateDebut) }}</td>
+                      <td class="px-6 py-4">{{ c.salaireParMois || c.SalaireParMois }} TND</td>
                       <td class="px-6 py-4">
-                        {{
-                          c.DateFinContrat || c.dateFinContrat || c.DateFin || c.dateFin
-                            ? formatDate(
-                                c.DateFinContrat || c.dateFinContrat || c.DateFin || c.dateFin,
-                              )
-                            : 'Actuel'
-                        }}
+                        {{ formatDate(c.dateDebut || c.DateDebut) }}
+                      </td>
+                      <td class="px-6 py-4">
+                        {{ c.dateFinContrat ? formatDate(c.dateFinContrat) : 'Actuel' }}
                       </td>
                     </tr>
                   </tbody>
                 </table>
+
                 <div
                   v-if="history.contrats.length === 0"
                   class="p-8 text-center text-gray-500 text-xs"
                 >
                   Aucun historique de contrat
                 </div>
-                <!-- Pagination -->
-                <div
-                  v-if="history.contrats.length > pageSize"
-                  class="p-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/30"
-                >
-                  <span class="text-[10px] text-gray-500 uppercase font-bold"
-                    >Page {{ pagination.contrat }} sur
-                    {{ Math.ceil(history.contrats.length / pageSize) }}</span
-                  >
-                  <div class="flex space-x-2">
-                    <button
-                      @click="pagination.contrat--"
-                      :disabled="pagination.contrat === 1"
-                      class="p-1 disabled:opacity-30"
+              </div>
+            </div>
+          </div>
+
+          <!-- Permission Interface -->
+          <div v-if="activeTab === 'permission'" class="space-y-6">
+            <div class="bg-white p-6 shadow-sm rounded-sm border border-gray-200">
+              <h3 class="text-lg font-bold text-gray-800 mb-6">Gérer les Permissions</h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Permissions Non Autorisées -->
+                <div class="border border-gray-200 rounded-sm overflow-hidden">
+                  <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                    <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Permissions non autorisées
+                    </h4>
+                  </div>
+                  <div class="p-4 space-y-3 min-h-[200px]">
+                    <div
+                      v-for="perm in unauthorizedPermissions"
+                      :key="perm"
+                      @click="addPermission(perm)"
+                      class="p-3 border border-gray-200 rounded-lg hover:border-[#0078d4] hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between group"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 19l-7-7 7-7"
-                        ></path>
-                      </svg>
-                    </button>
-                    <button
-                      @click="pagination.contrat++"
-                      :disabled="
-                        pagination.contrat >= Math.ceil(history.contrats.length / pageSize)
-                      "
-                      class="p-1 disabled:opacity-30"
+                      <span class="text-sm font-medium text-gray-700">{{ perm }}</span>
+                      <span
+                        class="text-[10px] text-[#0078d4] font-bold opacity-0 group-hover:opacity-100 uppercase tracking-tighter"
+                      >
+                        Ajouter
+                      </span>
+                    </div>
+                    <p
+                      v-if="unauthorizedPermissions.length === 0"
+                      class="text-xs text-gray-400 italic text-center mt-8"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 5l7 7-7 7"
-                        ></path>
-                      </svg>
-                    </button>
+                      Toutes les permissions sont accordées
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Permissions Autorisées -->
+                <div class="border border-gray-200 rounded-sm overflow-hidden">
+                  <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                    <h4 class="text-xs font-bold text-[#0078d4] uppercase tracking-wider">
+                      Permissions Autorisées
+                    </h4>
+                  </div>
+                  <div class="p-4 space-y-3 min-h-[200px]">
+                    <div
+                      v-for="perm in authorizedPermissions"
+                      :key="perm"
+                      @click="removePermission(perm)"
+                      class="p-3 border border-blue-100 bg-blue-50 rounded-lg hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all flex items-center justify-between group"
+                    >
+                      <span class="text-sm font-bold text-[#0078d4] group-hover:text-red-600">{{
+                        perm
+                      }}</span>
+                      <span
+                        class="text-[10px] text-red-600 font-bold opacity-0 group-hover:opacity-100 uppercase tracking-tighter"
+                      >
+                        Supprimer
+                      </span>
+                    </div>
+                    <p
+                      v-if="authorizedPermissions.length === 0"
+                      class="text-xs text-gray-400 italic text-center mt-8"
+                    >
+                      Aucune permission accordée
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Permission Form -->
-          <div
-            v-if="activeTab === 'permission'"
-            class="bg-white p-6 shadow-sm rounded-sm border border-gray-200"
-          >
-            <h3 class="text-lg font-bold text-gray-800 mb-6">Gérer la permission</h3>
-            <form @submit.prevent="submitPermission" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1"
-                  >Nom de la Permission</label
-                >
-                <input
-                  v-model="permissionForm.nomPermission"
-                  type="text"
-                  class="ms-input"
-                  placeholder="ex: Admin, Manager, Employe"
-                  required
-                />
-              </div>
-              <button type="submit" :disabled="loading" class="ms-button w-full">
-                Enregistrer la permission
-              </button>
-            </form>
-          </div>
         </div>
       </main>
     </div>
+    <EditEmployeModal
+      :show="showEditModal"
+      :loading="modalLoading"
+      :employe="employe"
+      @close="showEditModal = false"
+      @submit="handleEditSubmit"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { authService } from '../../../services/authService'
+import EditEmployeModal from '../../../components/admin/employes/EditEmployeModal.vue'
 
 const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
 
 const employeId = route.params.employeId
@@ -640,17 +556,71 @@ const entrepriseId = route.params.entrepriseId
 const sidebarOpen = ref(true)
 const activeTab = ref('info')
 const loading = ref(false)
+const modalLoading = ref(false)
+const showEditModal = ref(false)
 const employe = ref(null)
+const IsValidToAddPoste = ref(true)
+
+const availablePermissions = ['GERER_AVANCE', 'GERER_CONGE']
+
+const authorizedPermissions = computed(() => {
+  return employe.value?.permissions?.map((p) => p.nomPermission) || []
+})
+
+const unauthorizedPermissions = computed(() => {
+  return availablePermissions.filter((p) => !authorizedPermissions.value.includes(p))
+})
+
+const addPermission = async (permissionName) => {
+  loading.value = true
+  try {
+    const adminId = authStore.user?.id
+    await authService.addPermission(adminId, entrepriseId, employeId, permissionName)
+    await loadEmploye()
+  } catch (error) {
+    console.error('Error adding permission:', error)
+    alert("Erreur lors de l'ajout de la permission")
+  } finally {
+    loading.value = false
+  }
+}
+
+const removePermission = async (permissionName) => {
+  loading.value = true
+  try {
+    const adminId = authStore.user?.id
+    await authService.deletePermission(adminId, entrepriseId, employeId, permissionName)
+    await loadEmploye()
+  } catch (error) {
+    console.error('Error removing permission:', error)
+    alert('Erreur lors de la suppression de la permission')
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleEditSubmit = async (formData) => {
+  modalLoading.value = true
+  try {
+    const adminId = authStore.user?.id || authStore.user?.Id
+    await authService.updateEmploye(adminId, entrepriseId, employeId, formData)
+    await loadEmploye()
+    showEditModal.value = false
+  } catch (error) {
+    console.error('Error updating employe:', error)
+    alert('Erreur lors de la mise à jour')
+  } finally {
+    modalLoading.value = false
+  }
+}
 const history = reactive({
   postes: [],
-  salaires: [],
   contrats: [],
 })
 
 const pageSize = 5
 const pagination = reactive({
   poste: 1,
-  salaire: 1,
   contrat: 1,
 })
 
@@ -659,20 +629,13 @@ const paginatedPostes = computed(() => {
   return [...history.postes].reverse().slice(start, start + pageSize)
 })
 
-const paginatedSalaires = computed(() => {
-  const start = (pagination.salaire - 1) * pageSize
-  return [...history.salaires].reverse().slice(start, start + pageSize)
-})
-
 const paginatedContrats = computed(() => {
   const start = (pagination.contrat - 1) * pageSize
   return [...history.contrats].reverse().slice(start, start + pageSize)
 })
 
 const posteForm = reactive({ titre: '', dateDebut: '', dateFin: '' })
-const salaireForm = reactive({ montant: 0, dateDebut: '', dateFin: '' })
 const contratForm = reactive({ typeContrat: 'CDI', dateDebut: '', dateFin: '' })
-const permissionForm = reactive({ nomPermission: '' })
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
@@ -680,7 +643,6 @@ const formatDate = (date) => {
 }
 
 const loadEmploye = async () => {
-  // FIX: Utiliser authStore.user.id
   const adminId = authStore.user?.id
   if (!adminId) {
     console.error('Admin ID not available')
@@ -688,27 +650,20 @@ const loadEmploye = async () => {
   }
 
   try {
-    console.log('Loading employee:', employeId, 'for entreprise:', entrepriseId)
-
     // Charger les détails de l'employé
     employe.value = await authService.getEmployeDetail(adminId, entrepriseId, employeId)
-    console.log('Employee loaded:', employe.value)
 
     // Charger l'historique
-    const [p, s, c] = await Promise.all([
+    const [p, c] = await Promise.all([
       authService.getPostes(employeId),
-      authService.getSalaires(employeId),
       authService.getContrats(employeId),
     ])
 
     history.postes = p
-    history.salaires = s
     history.contrats = c
-
-    console.log('History loaded:', { postes: p, salaires: s, contrats: c })
+    IsValidToAddPoste.value = c.find((ct) => ct.dateFinContrat > Date.now()) ? false : true
   } catch (err) {
     console.error('Error loading employee details or history:', err)
-    alert('Erreur lors du chargement des données')
   }
 }
 
@@ -716,8 +671,6 @@ const submitPoste = async () => {
   loading.value = true
   try {
     const adminId = authStore.user?.id
-
-    console.log('Adding poste:', posteForm)
 
     await authService.addPoste(adminId, entrepriseId, employeId, {
       titre: posteForm.titre,
@@ -732,39 +685,8 @@ const submitPoste = async () => {
 
     // Reload data
     await loadEmploye()
-    alert('Poste ajouté avec succès')
   } catch (err) {
     console.error('Error adding poste:', err)
-    alert("Erreur lors de l'ajout du poste")
-  } finally {
-    loading.value = false
-  }
-}
-
-const submitSalaire = async () => {
-  loading.value = true
-  try {
-    const adminId = authStore.user?.id
-
-    console.log('Adding salaire:', salaireForm)
-
-    await authService.addSalaire(adminId, entrepriseId, employeId, {
-      montant: parseFloat(salaireForm.montant),
-      debut: salaireForm.dateDebut,
-      fin: salaireForm.dateFin || null,
-    })
-
-    // Reset form
-    salaireForm.montant = 0
-    salaireForm.dateDebut = ''
-    salaireForm.dateFin = ''
-
-    // Reload data
-    await loadEmploye()
-    alert('Salaire ajouté avec succès')
-  } catch (err) {
-    console.error('Error adding salaire:', err)
-    alert("Erreur lors de l'ajout du salaire")
   } finally {
     loading.value = false
   }
@@ -775,48 +697,22 @@ const submitContrat = async () => {
   try {
     const adminId = authStore.user?.id
 
-    console.log('Adding contrat:', contratForm)
-
     await authService.addContrat(adminId, entrepriseId, employeId, {
       type: contratForm.typeContrat,
       debut: contratForm.dateDebut,
       fin: contratForm.dateFin || null,
+      salaireParMois: contratForm.salaireParMois,
     })
 
-    // Reset form
+    // Reset
     contratForm.typeContrat = 'CDI'
     contratForm.dateDebut = ''
     contratForm.dateFin = ''
+    contratForm.salaireParMois = 0
 
-    // Reload data
     await loadEmploye()
-    alert('Contrat ajouté avec succès')
   } catch (err) {
-    console.error('Error adding contrat:', err)
-    alert("Erreur lors de l'ajout du contrat")
-  } finally {
-    loading.value = false
-  }
-}
-
-const submitPermission = async () => {
-  loading.value = true
-  try {
-    const adminId = authStore.user?.id
-
-    console.log('Adding permission:', permissionForm.nomPermission)
-
-    await authService.addPermission(adminId, entrepriseId, employeId, permissionForm.nomPermission)
-
-    // Reset form
-    permissionForm.nomPermission = ''
-
-    // Reload data
-    await loadEmploye()
-    alert('Permission ajoutée avec succès')
-  } catch (err) {
-    console.error('Error adding permission:', err)
-    alert("Erreur lors de l'ajout de la permission")
+    console.error(err)
   } finally {
     loading.value = false
   }

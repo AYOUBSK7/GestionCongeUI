@@ -10,7 +10,9 @@
         <div
           class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50"
         >
-          <h3 class="text-sm font-bold text-gray-800 uppercase tracking-tight">Nouvel Employé</h3>
+          <h3 class="text-sm font-bold text-gray-800 uppercase tracking-tight">
+            Modifier l'Employé
+          </h3>
           <button
             @click="$emit('close')"
             class="text-gray-400 hover:text-gray-600 transition-colors"
@@ -28,110 +30,57 @@
 
         <form @submit.prevent="handleSubmit" class="px-6 py-6 overflow-y-auto max-h-[80vh]">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <!-- Informations personnelles -->
             <div class="space-y-4">
               <h4 class="text-xs font-bold text-[#0078d4] uppercase">Infos Personnelles</h4>
-
               <div>
                 <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
                   >Nom</label
                 >
                 <input v-model="form.nom" type="text" class="ms-input text-sm" required />
               </div>
-
               <div>
                 <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
                   >Prénom</label
                 >
                 <input v-model="form.prenom" type="text" class="ms-input text-sm" required />
               </div>
-
               <div>
                 <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
                   >Email</label
                 >
                 <input v-model="form.email" type="email" class="ms-input text-sm" required />
               </div>
-
               <div>
                 <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
                   >Adresse</label
                 >
                 <input v-model="form.adresse" type="text" class="ms-input text-sm" />
               </div>
-
-              <!-- 🔹 AJOUT -->
-              <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Téléphone principal
-                </label>
-                <input v-model="form.telephonePrincipal" type="tel" class="ms-input text-sm" />
-              </div>
-
-              <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Téléphone secondaire
-                </label>
-                <input v-model="form.telephoneSecondaire" type="tel" class="ms-input text-sm" />
-              </div>
             </div>
 
-            <!-- Compte et Poste -->
             <div class="space-y-4">
-              <h4 class="text-xs font-bold text-[#0078d4] uppercase">Compte & RH</h4>
-
+              <h4 class="text-xs font-bold text-[#0078d4] uppercase">Coordonnées & RH</h4>
               <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Nom d'utilisateur
-                </label>
-                <input
-                  v-model="form.nomUtilisateur"
-                  type="text"
-                  class="ms-input text-sm"
-                  required
-                />
+                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
+                  >Téléphone principal</label
+                >
+                <input v-model="form.telephonePrincipal" type="tel" class="ms-input text-sm" />
               </div>
-
               <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Mot de passe
-                </label>
-                <input
-                  v-model="form.motDePasse"
-                  type="password"
-                  class="ms-input text-sm"
-                  required
-                />
+                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
+                  >Téléphone secondaire</label
+                >
+                <input v-model="form.telephoneSecondaire" type="tel" class="ms-input text-sm" />
               </div>
-
               <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Identifiant interne
-                </label>
-                <input v-model="form.identifiant" type="text" class="ms-input text-sm" required />
-              </div>
-
-              <div>
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Solde congés (jours)
-                </label>
+                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase"
+                  >Solde congés (jours)</label
+                >
                 <input
                   v-model.number="form.soldeConge"
                   type="number"
                   class="ms-input text-sm"
                   required
-                />
-              </div>
-
-              <div v-if="AvoirSuperieur">
-                <label class="block text-[10px] font-semibold text-gray-500 mb-1 uppercase">
-                  Superieur hiérarchique
-                </label>
-                <input
-                  v-model="form.superieur"
-                  type="checkbox"
-                  class="ms-input text-sm"
-                  @change="test"
                 />
               </div>
             </div>
@@ -141,9 +90,8 @@
             <button type="button" @click="$emit('close')" class="ms-button-secondary">
               Annuler
             </button>
-
             <button type="submit" :disabled="loading" class="ms-button">
-              {{ loading ? 'Création...' : "Créer l'employé" }}
+              {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
             </button>
           </div>
         </form>
@@ -158,51 +106,38 @@ import { reactive, watch } from 'vue'
 const props = defineProps({
   show: Boolean,
   loading: Boolean,
-  AvoirSuperieur: Boolean,
+  employe: Object,
 })
 
 const emit = defineEmits(['close', 'submit'])
 
 const form = reactive({
-  nomUtilisateur: '',
-  email: '',
-  motDePasse: '',
-  prenom: '',
   nom: '',
+  prenom: '',
+  email: '',
   adresse: '',
   telephonePrincipal: '',
   telephoneSecondaire: '',
-  identifiant: '',
   soldeConge: 0,
-  superieur: false,
 })
 
-// FIX: Reset form when modal opens
 watch(
-  () => props.show,
+  () => props.employe,
   (newVal) => {
     if (newVal) {
-      form.nomUtilisateur = ''
-      form.email = ''
-      form.motDePasse = ''
-      form.prenom = ''
-      form.nom = ''
-      form.adresse = ''
-      form.telephonePrincipal = ''
-      form.telephoneSecondaire = ''
-      form.identifiant = ''
-      form.soldeConge = 0
-      form.superieur = false
+      form.nom = newVal.nom || ''
+      form.prenom = newVal.prenom || ''
+      form.email = newVal.email || ''
+      form.adresse = newVal.adresse || ''
+      form.telephonePrincipal = newVal.telephonePrincipal || ''
+      form.telephoneSecondaire = newVal.telephoneSecondaire || ''
+      form.soldeConge = newVal.soldeConges || 0
     }
   },
+  { immediate: true },
 )
 
-function test() {
-  console.log('Checkbox superieur changed:', form.superieur)
-}
-
 const handleSubmit = () => {
-  console.log('Submitting employee form:', form)
   emit('submit', { ...form })
 }
 </script>

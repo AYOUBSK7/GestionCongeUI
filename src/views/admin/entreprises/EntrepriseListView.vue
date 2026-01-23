@@ -165,17 +165,7 @@
                   </svg>
                 </button>
               </div>
-              <button @click="showAddModal = true" class="ms-button flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                  ></path>
-                </svg>
-                <span>Nouvelle Entreprise</span>
-              </button>
+              <button @click="showAddModal = true" class="ms-button">Nouvelle Entreprise</button>
             </div>
           </div>
 
@@ -189,47 +179,41 @@
               :key="ent.id"
               class="bg-white border border-gray-200 shadow-sm rounded-sm hover:shadow-md transition-shadow flex flex-col"
             >
-              <div class="p-5 border-b border-gray-100 flex items-start justify-between">
-                <div class="flex items-center space-x-4">
-                  <div
-                    class="w-12 h-12 bg-blue-50 text-[#0078d4] rounded flex items-center justify-center font-bold text-lg border border-blue-100"
-                  >
-                    {{ ent.nom?.[0] }}
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-gray-800 leading-tight">{{ ent.nom }}</h3>
-                    <span
-                      class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full uppercase border border-green-100 mt-1 inline-block"
-                      >Actif</span
+              <div class="p-5 border-b border-gray-100 flex flex-col space-y-4">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-center space-x-4">
+                    <div
+                      class="w-12 h-12 bg-blue-50 text-[#0078d4] rounded flex items-center justify-center font-bold text-lg border border-blue-100"
                     >
+                      {{ ent.nom?.[0] }}
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-gray-800 leading-tight">{{ ent.nom }}</h3>
+                      <span
+                        v-if="ent.statut === 'Actif'"
+                        class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full uppercase border border-green-100 mt-1 inline-block"
+                        >{{ ent.statut }}</span
+                      >
+                      <span
+                        v-else
+                        class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full uppercase border border-red-100 mt-1 inline-block"
+                        >{{ ent.statut }}</span
+                      >
+                    </div>
                   </div>
                 </div>
-                <div class="flex items-center space-x-1">
+                <div class="flex items-center space-x-2">
                   <button
                     @click="openEditModal(ent)"
-                    class="p-1.5 text-gray-400 hover:text-[#0078d4] hover:bg-blue-50 rounded transition-colors"
+                    class="flex-1 px-3 py-1.5 text-xs font-semibold text-[#0078d4] border border-[#0078d4] hover:bg-blue-50 rounded transition-colors"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      ></path>
-                    </svg>
+                    Modifier
                   </button>
                   <button
-                    @click="removeEntreprise(ent.id)"
-                    class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    @click="toggleEntrepriseStatus(ent)"
+                    class="flex-1 px-3 py-1.5 text-xs font-semibold text-orange-600 border border-orange-600 hover:bg-orange-50 rounded transition-colors"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
-                    </svg>
+                    {{ ent.statut === 'Actif' ? 'Désactiver' : 'Activer' }}
                   </button>
                 </div>
               </div>
@@ -384,49 +368,35 @@
                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ ent.adresse }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span
+                        v-if="ent.statut === 'Actif'"
                         class="px-2 py-0.5 bg-green-50 text-green-600 text-[10px] font-bold rounded-full border border-green-100 uppercase tracking-tighter"
-                        >Actif</span
+                        >{{ ent.statut }}</span
+                      >
+                      <span
+                        v-else
+                        class="px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100 uppercase tracking-tighter"
+                        >{{ ent.statut }}</span
                       >
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
-                      <div class="flex justify-end space-x-3">
+                      <div class="flex justify-end items-center space-x-2">
+                        <router-link
+                          :to="`/admin/entreprises/${ent.id}`"
+                          class="px-2 py-1 text-[10px] font-bold text-gray-600 border border-gray-300 hover:bg-gray-100 rounded uppercase tracking-wider transition-colors"
+                        >
+                          Employés
+                        </router-link>
                         <button
                           @click="openEditModal(ent)"
-                          class="text-[#0078d4] hover:text-[#106ebe]"
-                          title="Modifier"
+                          class="px-2 py-1 text-[10px] font-bold text-[#0078d4] border border-[#0078d4] hover:bg-blue-50 rounded uppercase tracking-wider transition-colors"
                         >
-                          <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            ></path>
-                          </svg>
+                          Modifier
                         </button>
                         <button
-                          @click="removeEntreprise(ent.id)"
-                          class="text-red-500 hover:text-red-700"
-                          title="Supprimer"
+                          @click="toggleEntrepriseStatus(ent)"
+                          class="px-2 py-1 text-[10px] font-bold text-orange-600 border border-orange-600 hover:bg-orange-50 rounded uppercase tracking-wider transition-colors"
                         >
-                          <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            ></path>
-                          </svg>
+                          {{ ent.statut === 'Actif' ? 'Désactiver' : 'Activer' }}
                         </button>
                       </div>
                     </td>
@@ -476,16 +446,27 @@
       @close="showEditModal = false"
       @submit="handleEditSubmit"
     />
+
+    <!-- Confirm Status Modal -->
+    <ConfirmModalStatus
+      :show="showConfirmModal"
+      :loading="modalLoading"
+      :title="confirmModalData.title"
+      :message="confirmModalData.message"
+      @close="showConfirmModal = false"
+      @confirm="handleConfirmStatus"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useAuthStore } from '../../../stores/auth'
 import { authService } from '../../../services/authService'
 import { useRouter } from 'vue-router'
 import AddEntrepriseModal from '../../../components/admin/entreprises/AddEntrepriseModal.vue'
 import EditEntrepriseModal from '../../../components/admin/entreprises/EditEntrepriseModal.vue'
+import ConfirmModalStatus from '../../../components/admin/entreprises/ConfirmStatusModal.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -493,36 +474,25 @@ const router = useRouter()
 const sidebarOpen = ref(true)
 const showAddModal = ref(false)
 const showEditModal = ref(false)
+const showConfirmModal = ref(false)
 const viewMode = ref('table') // 'table' or 'grid'
 const currentEntreprise = ref(null)
 const loading = ref(false)
 const modalLoading = ref(false)
 const entreprises = ref([])
 
-const loadEntreprises = async () => {
-  const adminId = authStore.user?.id
-  if (adminId === undefined || adminId === null) {
-    return
-  }
-  loading.value = true
-  try {
-    entreprises.value = await authService.getEntreprises(adminId)
-    console.log('Loaded entreprises:', entreprises.value)
-  } catch (error) {
-    console.error('Error loading entreprises:', error)
-  } finally {
-    loading.value = false
-  }
-}
+const confirmModalData = reactive({
+  title: '',
+  message: '',
+  targetEntreprise: null,
+  newStatus: '',
+})
 
 const handleAddSubmit = async (formData) => {
   modalLoading.value = true
   try {
-    const adminId = authStore.user?.id
-    if (adminId === undefined || adminId === null) {
-      console.error('Admin ID is missing', authStore.user)
-      return
-    }
+    const adminId = authStore.user?.id || authStore.user?.Id
+    if (!adminId) return
     await authService.addEntreprise(adminId, formData)
     await loadEntreprises()
     showAddModal.value = false
@@ -541,12 +511,9 @@ const openEditModal = (entreprise) => {
 const handleEditSubmit = async (formData) => {
   modalLoading.value = true
   try {
-    const adminId = authStore.user?.id
+    const adminId = authStore.user?.id || authStore.user?.Id
     const entrepriseId = currentEntreprise.value?.id
-    if (!adminId || !entrepriseId) {
-      console.error('Missing IDs for update:', { adminId, entrepriseId })
-      return
-    }
+    if (!adminId || !entrepriseId) return
     await authService.updateEntreprise(adminId, entrepriseId, formData)
     await loadEntreprises()
     showEditModal.value = false
@@ -557,19 +524,53 @@ const handleEditSubmit = async (formData) => {
   }
 }
 
-const removeEntreprise = async (id) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette entreprise ?')) {
-    try {
-      const adminId = authStore.user?.id
-      if (!adminId) {
-        console.error('Admin ID is missing for delete')
-        return
-      }
-      await authService.deleteEntreprise(adminId, id)
-      await loadEntreprises()
-    } catch (error) {
-      console.error('Error deleting entreprise:', error)
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
+
+const loadEntreprises = async () => {
+  const adminId = authStore.user?.id || authStore.user?.Id
+  if (!adminId) return
+  loading.value = true
+  try {
+    entreprises.value = await authService.getEntreprises(adminId)
+  } catch (error) {
+    console.error('Error loading entreprises:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const toggleEntrepriseStatus = (entreprise) => {
+  const newStatus = entreprise.statut === 'Actif' ? 'Inactif' : 'Actif'
+  confirmModalData.title =
+    newStatus === 'Actif' ? "Activer l'entreprise" : "Désactiver l'entreprise"
+  confirmModalData.message = `Êtes-vous sûr de vouloir ${newStatus === 'Actif' ? 'activer' : 'désactiver'} l'entreprise ${entreprise.nom} ?`
+  confirmModalData.targetEntreprise = entreprise
+  confirmModalData.newStatus = newStatus
+  showConfirmModal.value = true
+}
+
+const handleConfirmStatus = async () => {
+  modalLoading.value = true
+  try {
+    const adminId = authStore.user?.id || authStore.user?.Id
+    const entreprise = confirmModalData.targetEntreprise
+    const updatedData = {
+      nom: entreprise.nom,
+      adresse: entreprise.adresse,
+      telephone: entreprise.telephone,
+      email: entreprise.email,
+      statut: confirmModalData.newStatus,
     }
+    await authService.updateEntreprise(adminId, entreprise.id, updatedData)
+    await loadEntreprises()
+    showConfirmModal.value = false
+  } catch (error) {
+    console.error('Error toggling status:', error)
+  } finally {
+    modalLoading.value = false
   }
 }
 
@@ -587,11 +588,6 @@ onMounted(async () => {
     loadEntreprises()
   }
 })
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/login')
-}
 </script>
 
 <style scoped>
