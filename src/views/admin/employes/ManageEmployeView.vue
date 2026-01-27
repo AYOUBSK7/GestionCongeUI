@@ -561,7 +561,7 @@ const showEditModal = ref(false)
 const employe = ref(null)
 const IsValidToAddPoste = ref(true)
 
-const availablePermissions = ['GERER_AVANCE', 'GERER_CONGE']
+const availablePermissions = ['GERER_AVANCE', 'GERER_CONGE','GERER_ABSENCE']
 
 const authorizedPermissions = computed(() => {
   return employe.value?.permissions?.map((p) => p.nomPermission) || []

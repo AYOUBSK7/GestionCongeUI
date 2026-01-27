@@ -258,10 +258,156 @@ export const authService = {
     )
     return response.data
   },
+  async GetCompte(employeId) {
+  const response = await api.get(`/api/employes/${employeId}/Detail`)
+  console.log('GetCompte response data:', response.data)
+  return response.data
+},
+async getConges (employeId) {
+  const response = await api.get(`/api/demandes/conges`)
+  return response.data
+},
+
+async SubmitDemandeConge( congeData) {
+  const payload = {
+    dateDebut: congeData.dateDebut,
+    dateFin: congeData.dateFin,
+    motif: congeData.motif,
+  }
+  const response = await api.post(
+    `/api/demandes/conges`,
+    payload,
+  )
+  return response.data
+},
+
+async SubmitDemandeAvance(avanceData) {
+  const payload = {
+    montant: avanceData.montant,
+    motif: avanceData.motif,
+  }
+  const response = await api.post(
+    `/api/demandes/avances`,
+    payload,
+  )
+  return response.data
+},
+
+async getAvances (employeId) {
+  const response = await api.get(`/api/demandes/avances`)
+  return response.data
+},
+async AnnulerDemandeConge(demandeId) {
+  const response = await api.delete(`/api/demandes/conges/${demandeId}`)
+  return response.data
+},
+async AnnulerDemandeAvance(demandeId) {
+  const response = await api.delete(`/api/demandes/avances/${demandeId}`)
+  return response.data
+},
+
+
+// Récupérer les demandes de congés à approuver
+async getDemandesCongesAApprouver() {
+    const response = await api.get('/api/demandes/conges/a-approuver')
+    return response.data
+ 
+},
+// Récupérer les demandes d'avances à approuver
+async getDemandesAvancesAApprouver() {
+  
+      const response = await api.get('/api/demandes/avances/a-approuver')
+      return response.data
+},
+
+
+// Approuver une demande de congé
+async approuverDemandeConge(id) {
+  try {
+    const response = await api.put(`/api/demandes/conges/${id}/approuver`)
+    return response.data
+  } catch (error) {
+    console.error('Erreur dans approuverDemandeConge:', error)
+    throw error
+  }
+},
+
+// Refuser une demande de congé
+async refuserDemandeConge(id) {
+  try {
+    const response = await api.put(`/api/demandes/conges/${id}/refuser`)
+    return response.data
+  } catch (error) {
+    console.error('Erreur dans refuserDemandeConge:', error)
+    throw error
+  }
+},
+
+// Approuver une demande d'avance
+async approuverDemandeAvance(id) {
+  try {
+    const response = await api.put(`/api/demandes/avances/${id}/approuver`)
+    return response.data
+  } catch (error) {
+    console.error('Erreur dans approuverDemandeAvance:', error)
+    throw error
+  }
+},
+
+// Refuser une demande d'avance
+async refuserDemandeAvance(id) {
+  try {
+    const response = await api.put(`/api/demandes/avances/${id}/refuser`)
+    return response.data
+  } catch (error) {
+    console.error('Erreur dans refuserDemandeAvance:', error)
+    throw error
+  }
+},
+  async createAbsence(data) {
+   const response = await api.post('/api/absences', {
+      dateDebut: data.dateDebut,
+      dateFin: data.dateFin,
+      motif: data.motif,
+    })
+    return response.data
+  },
+
+
+  async getMesDemandesAbsences() {
+    const response = await api.get('/api/absences/mes-demandes')
+    return response.data
+  },
+
+  async getAbsenceById(id) {
+    const response = await api.get(`/api/absences/${id}`)
+    return response.data
+  },
+
+  async deleteAbsence(id) {
+    const response = await api.delete(`/api/absences/${id}`)
+    return response.data
+  },
+
+  async getAbsencesAApprouver() {
+    const response = await api.get('/api/absences/a-approuver')
+    return response.data
+  },
+
+  async approuverAbsence(id) {
+    const response = await api.put(`/api/absences/${id}/approuver`)
+    return response.data
+  },
+
+  async refuserAbsence(id, motifRefus) {
+    const response = await api.put(`/api/absences/${id}/refuser`, { motifRefus })
+    return response.data
+  },
+  
 
   logout() {
     Cookies.remove('token')
-  },
+  }
 }
 
 export default api
