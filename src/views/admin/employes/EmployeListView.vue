@@ -262,7 +262,6 @@ const currentEmploye = ref(null)
 const superieur = ref({})
 
 const loadData = async () => {
-  // FIX: Utiliser authStore.user.id au lieu de authStore.user?.Id
   const adminId = authStore.user?.id
   if (!adminId) {
     console.error('Admin ID not available')
@@ -322,7 +321,6 @@ const confirmDelete = async (empId) => {
       const adminId = authStore.user?.id
       await authService.deleteEmploye(adminId, entrepriseId, empId)
 
-      // FIX: Recharger la liste au lieu de filtrer manuellement
       await loadData()
       alert('Employé supprimé avec succès')
     } catch (err) {

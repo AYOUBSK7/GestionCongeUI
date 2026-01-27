@@ -650,10 +650,8 @@ const loadEmploye = async () => {
   }
 
   try {
-    // Charger les détails de l'employé
     employe.value = await authService.getEmployeDetail(adminId, entrepriseId, employeId)
 
-    // Charger l'historique
     const [p, c] = await Promise.all([
       authService.getPostes(employeId),
       authService.getContrats(employeId),
@@ -661,7 +659,8 @@ const loadEmploye = async () => {
 
     history.postes = p
     history.contrats = c
-    IsValidToAddPoste.value = c.find((ct) => ct.dateFinContrat > Date.now()) ? false : true
+    IsValidToAddPoste.value =
+      !c || c.find((ct) => ct.dateFinContrat && ct.dateFinContrat > Date.now()) ? false : true
   } catch (err) {
     console.error('Error loading employee details or history:', err)
   }
@@ -678,12 +677,10 @@ const submitPoste = async () => {
       fin: posteForm.dateFin || null,
     })
 
-    // Reset form
     posteForm.titre = ''
     posteForm.dateDebut = ''
     posteForm.dateFin = ''
 
-    // Reload data
     await loadEmploye()
   } catch (err) {
     console.error('Error adding poste:', err)
@@ -704,7 +701,6 @@ const submitContrat = async () => {
       salaireParMois: contratForm.salaireParMois,
     })
 
-    // Reset
     contratForm.typeContrat = 'CDI'
     contratForm.dateDebut = ''
     contratForm.dateFin = ''

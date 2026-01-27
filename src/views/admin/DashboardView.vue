@@ -365,10 +365,8 @@ const loadStats = async () => {
     const adminId = authStore.user.id
     entreprises.value = await authService.getEntreprises(adminId)
 
-    // Charger les détails des expirations depuis l'API
     try {
       const data = await authService.getExpirations(adminId)
-      // On mappe directement les listes reçues
       alertesContrats.value = data.contrats || []
       alertesPostes.value = data.postes || []
     } catch (err) {

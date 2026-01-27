@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
 })
 
 export const authService = {
-  // use
+  // use done
   async login(loginDto) {
     const response = await api.post('/api/Account/login', loginDto)
     const token = response.data.token
@@ -36,32 +36,32 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async register(registerDto) {
     const response = await api.post('/api/Account/register', registerDto)
     return response.data
   },
 
-  // use
+  // use done
   async getMe() {
     const response = await api.get('/api/Account/me')
     return response.data
   },
 
   // Entreprises API
-  // use
+  // use done
   async getEntreprises(adminId) {
     const response = await api.get(`/api/administrateur/${adminId}/entreprises`)
     return response.data
   },
 
-  // use
+  // use done
   async getEntreprise(adminId, entrepriseId) {
     const response = await api.get(`/api/administrateur/${adminId}/entreprises/${entrepriseId}`)
     return response.data
   },
 
-  // use
+  // use done
   async addEntreprise(adminId, entrepriseData) {
     if (!adminId) {
       console.error('addEntreprise called with null adminId')
@@ -77,12 +77,12 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async updateEntreprise(adminId, entrepriseId, entrepriseData) {
     const payload = {
       nom: entrepriseData.nom,
       adresse: entrepriseData.adresse,
-      telephone: entrepriseData.telephone, // FIX: était 'tel'
+      telephone: entrepriseData.telephone,
       email: entrepriseData.email,
       statut: entrepriseData.statut,
     }
@@ -94,7 +94,7 @@ export const authService = {
   },
 
   // Employes API
-  // use
+  // use done
   async getEmployes(adminId, entrepriseId) {
     const response = await api.get(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes`,
@@ -110,7 +110,7 @@ export const authService = {
     }))
   },
 
-  // use
+  // use done
   async getEmployeDetail(adminId, entrepriseId, employeId) {
     try {
       const response = await api.get(
@@ -141,7 +141,7 @@ export const authService = {
     }
   },
 
-  // use
+  // use done
   async addEmploye(adminId, entrepriseId, employeData) {
     const payload = {
       nomUtilisateur: employeData.nomUtilisateur,
@@ -163,7 +163,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async addContrat(adminId, entrepriseId, employeId, contratData) {
     const payload = {
       typeContrat: contratData.type,
@@ -178,7 +178,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async addPoste(adminId, entrepriseId, employeId, posteData) {
     const payload = {
       titre: posteData.titre,
@@ -192,7 +192,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async addPermission(adminId, entrepriseId, employeId, permissionName) {
     const payload = {
       nomPermission: permissionName,
@@ -205,7 +205,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async deletePermission(adminId, entrepriseId, employeId, permissionName) {
     const response = await api.delete(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}/permissions/${permissionName}`,
@@ -213,7 +213,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async updateEmploye(adminId, entrepriseId, employeId, employeData) {
     const payload = {
       nom: employeData.nom,
@@ -231,19 +231,19 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async getPostes(employeId) {
     const response = await api.get(`/api/employes/${employeId}/postes`)
     return response.data
   },
 
-  // use
+  // use done
   async getContrats(employeId) {
     const response = await api.get(`/api/employes/${employeId}/contrats`)
     return response.data
   },
 
-  // use
+  // use done
   async deleteEmploye(adminId, entrepriseId, employeId) {
     const response = await api.delete(
       `/api/administrateur/${adminId}/entreprises/${entrepriseId}/employes/${employeId}`,
@@ -251,7 +251,7 @@ export const authService = {
     return response.data
   },
 
-  // use
+  // use done
   async getExpirations(adminId, jours = 30) {
     const response = await api.get(
       `/api/administrateur/${adminId}/entreprises/expirations?joursAvantExpiration=${jours}`,
