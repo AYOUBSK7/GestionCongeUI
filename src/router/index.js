@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import AdminDashboard from '../views/admin/DashboardView.vue'
-import EmployeeDashboard from '../views/employee/DashboardView.vue'
+import EmployeeLayout from '../views/employee/DashboardView.vue'
 import { useAuthStore } from '../stores/auth'
 import Cookies from 'js-cookie'
 
@@ -50,10 +50,36 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
-      path: '/employee/dashboard',
-      name: 'employee-dashboard',
-      component: EmployeeDashboard,
+      path: '/employee',
+      component: EmployeeLayout,
       meta: { requiresAuth: true, role: 'user' },
+      children: [
+        {
+          path: 'dashboard',
+          name: 'employee-dashboard',
+          component: () => import('../views/employee/EmployeeDashboardView.vue'),
+        },
+        {
+          path: 'mon-compte',
+          name: 'employee-mon-compte',
+          component: () => import('../views/employee/MonCompteView.vue'),
+        },
+        {
+          path: 'demande-conge',
+          name: 'employee-demande-conge',
+          component: () => import('../views/employee/DemandeCongeView.vue'),
+        },
+        {
+          path: 'demande-avance',
+          name: 'employee-demande-avance',
+          component: () => import('../views/employee/DemandeAvanceView.vue'),
+        },
+        {
+          path: 'demande-absence',
+          name: 'employee-demande-absence',
+          component: () => import('../views/employee/DemandeAbsenceView.vue'),
+        },
+      ],
     },
   ],
 })
@@ -75,7 +101,6 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    // FIX: Utiliser authStore.user.role directement
     const userRole = (authStore.user?.role || '').toLowerCase()
     const requiredRole = (to.meta.role || '').toLowerCase()
 

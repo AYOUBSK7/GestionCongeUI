@@ -258,7 +258,8 @@ export const authService = {
     )
     return response.data
   },
-  async GetCompte(employeId) {
+  async getCompte(employeId) {
+    console.log('testttttttteeee')
     const response = await api.get(`/api/employes/${employeId}/Detail`)
     console.log('GetCompte response data:', response.data)
     return response.data
@@ -362,8 +363,7 @@ export const authService = {
   },
   async createAbsence(data) {
     const response = await api.post('/api/absences', {
-      dateDebut: data.dateDebut,
-      dateFin: data.dateFin,
+      date: data.date,
       motif: data.motif,
     })
     return response.data
@@ -371,11 +371,6 @@ export const authService = {
 
   async getMesDemandesAbsences() {
     const response = await api.get('/api/absences/mes-demandes')
-    return response.data
-  },
-
-  async getAbsenceById(id) {
-    const response = await api.get(`/api/absences/${id}`)
     return response.data
   },
 
@@ -394,8 +389,8 @@ export const authService = {
     return response.data
   },
 
-  async refuserAbsence(id, motifRefus) {
-    const response = await api.put(`/api/absences/${id}/refuser`, { motifRefus })
+  async refuserAbsence(id, commentaire) {
+    const response = await api.put(`/api/absences/${id}/refuser`, { commentaire })
     return response.data
   },
 

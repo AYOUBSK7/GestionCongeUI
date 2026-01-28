@@ -40,7 +40,8 @@ export const useAuthStore = defineStore('auth', {
           email: user.email,
           nom: user.nom,
           prenom: user.prenom,
-          role: user.role, // Le backend renvoie 'role' en minuscule
+          role: user.role,
+          roleEmploye: user.roleEmploye,
           telephonePrincipal: user.telephonePrincipal,
           telephoneSecondaire: user.telephoneSecondaire,
         }
